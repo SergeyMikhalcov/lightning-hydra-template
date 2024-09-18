@@ -10,9 +10,7 @@ from pytorch_lightning import (
     Trainer,
     seed_everything,
 )
-from pytorch_lightning.loggers import LightningLoggerBase
-
-from src import utils
+from pytorch_lightning.loggers import Logger
 
 # --------------------------------------------------------------------------- #
 # `pyrootutils.setup_root(...)` above is optional line to make environment more
@@ -50,13 +48,15 @@ root = pyrootutils.setup_root(
     pythonpath=True,
     dotenv=True,
 )
+
+from src import utils
+
 _HYDRA_PARAMS = {
     "version_base": "1.3",
     "config_path": str(root / "configs"),
     "config_name": "train.yaml",
 }
 log = utils.get_pylogger(__name__)
-
 
 @utils.task_wrapper
 def train(cfg: DictConfig) -> Tuple[dict, dict]:
@@ -101,7 +101,7 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 
     # Init loggers
     log.info("Instantiating loggers...")
-    logger: List[LightningLoggerBase] = utils.instantiate_loggers(
+    logger: List[Logger] = utils.instantiate_loggers(
         cfg.get("logger")
     )
 
@@ -177,7 +177,7 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 @utils.register_custom_resolvers(**_HYDRA_PARAMS)
 @hydra.main(**_HYDRA_PARAMS)
 def main(cfg: DictConfig) -> Optional[float]:
-
+    
     # train the model
     metric_dict, _ = train(cfg)
 
