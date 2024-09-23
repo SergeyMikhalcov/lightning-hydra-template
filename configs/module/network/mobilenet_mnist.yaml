@@ -1,0 +1,24 @@
+# this config file is used for running the template default tests
+
+model:
+  _target_: src.modules.models.classification.Classifier
+  model_name: timm/mobilenetv2_035
+  num_classes: 10
+  in_chans: 1
+  pretrained: False
+
+loss:
+  _target_: "torch.nn.CrossEntropyLoss"
+
+metrics:
+  main:
+    _target_: "torchmetrics.Accuracy"
+    task: "multiclass"
+    num_classes: 10
+    top_k: 1
+  valid_best:
+    _target_: "torchmetrics.MaxMetric"
+
+output_activation:
+  _target_: "torch.softmax"
+  dim: 1

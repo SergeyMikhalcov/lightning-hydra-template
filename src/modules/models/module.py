@@ -140,6 +140,7 @@ class BaseModule(torch.nn.Module):
         """
 
         super().__init__()
+        print(kwargs)
         if "torchvision.models" in model_name:
             model_name = model_name.split("torchvision.models/")[1]
             self.model = getattr(models, model_name)(**kwargs)

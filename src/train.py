@@ -11,7 +11,40 @@ from pytorch_lightning import (
     seed_everything,
 )
 from pytorch_lightning.loggers import Logger
+from clearml import Task
 
+import warnings
+import contextlib
+
+import requests
+from urllib3.exceptions import InsecureRequestWarning
+
+old_merge_environment_settings = requests.Session.merge_environment_settings
+
+@contextlib.contextmanager
+def no_ssl_verification():
+    opened_adapters = set()
+
+    def merge_environment_settings(self, url, proxies, stream, verify, cert):
+
+        opened_adapters.add(self.get_adapter(url))
+
+        settings = old_merge_environment_settings(
+            self, url, proxies, stream, verify, cert
+        )
+        settings["verify"] = False
+
+        return settings
+
+    requests.Session.merge_environment_settings = merge_environment_settings
+
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", InsecureRequestWarning)
+            yield
+    finally:
+        requests.Session.merge_environment_settings = old_merge_environment_settings
+        
 # --------------------------------------------------------------------------- #
 # `pyrootutils.setup_root(...)` above is optional line to make environment more
 # convenient should be placed at the top of each entry file
@@ -56,8 +89,10 @@ _HYDRA_PARAMS = {
     "config_path": str(root / "configs"),
     "config_name": "train.yaml",
 }
+
 log = utils.get_pylogger(__name__)
 
+@no_ssl_verification()
 @utils.task_wrapper
 def train(cfg: DictConfig) -> Tuple[dict, dict]:
     """Trains the model. Can additionally evaluate on a testset, using best
@@ -178,6 +213,10 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 @hydra.main(**_HYDRA_PARAMS)
 def main(cfg: DictConfig) -> Optional[float]:
     
+    #print(cfg)
+    task = Task.init(task_name="MNIST_OPTUNA", project_name="MNIST_OPTUNA_Example")
+    task.execute_remotely(queue_name='default', exit_process=True)
+    
     # train the model
     metric_dict, _ = train(cfg)
 
@@ -191,4 +230,5 @@ def main(cfg: DictConfig) -> Optional[float]:
 
 
 if __name__ == "__main__":
+    
     main()

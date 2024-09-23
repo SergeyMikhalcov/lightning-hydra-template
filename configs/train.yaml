@@ -5,20 +5,20 @@
 defaults:
   - _self_
   - datamodule: mnist.yaml
-  - module: mnist.yaml
+  - module: mobilenet.yaml
   - callbacks: mnist.yaml
-  - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
-  - trainer: default.yaml
+  - logger: tensorboard.yaml # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
+  - trainer: gpu.yaml
   - paths: default.yaml
   - extras: default.yaml
   - hydra: default.yaml
 
   # experiment configs allow for version control of specific hyperparameters
   # e.g. the best hyperparameters for given model and datamodule
-  - experiment: null
+  - experiment: mobilenet
 
   # config for hyperparameter optimization
-  - hparams_search: null
+  - hparams_search: mnist_optuna_mobilenet
 
   # optional local config for machine/user specific settings
   # it's optional since it doesn't need to exist and is excluded from version control

@@ -11,20 +11,26 @@ datasets:
 # because we split initial train + test into train + valid + test
 transforms:
   train:
-    order: ["normalize"]
+    order: ["normalize", "to_tensor"]
     normalize:
       _target_: albumentations.Normalize
       mean: [0.1307]
       std: [0.3081]
       p: 1.0
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      always_apply: True
 
   valid_test_predict:
-    order: ["normalize"]
+    order: ["normalize", "to_tensor"]
     normalize:
       _target_: albumentations.Normalize
       mean: [0.1307]
       std: [0.3081]
       p: 1.0
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      always_apply: True
 
 loaders:
   train:

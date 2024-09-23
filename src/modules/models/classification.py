@@ -2,6 +2,7 @@ from typing import Any, List, Optional
 
 import torch
 from torch import nn
+from torchsummary import summary
 
 from src.modules.models.module import (
     BaseModule,
@@ -58,6 +59,7 @@ class Classifier(BaseModule):
         replace_module_by_identity(
             self.model, head, nn.Linear(in_features, num_classes, bias=True)
         )
+        print(self.model)
         self.num_classes = num_classes
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
