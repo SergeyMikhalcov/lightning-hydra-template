@@ -49,27 +49,40 @@ class BaseDataset(Dataset):
             else:
                 image = cv2.imread(image)
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        elif self.read_mode == "uint16":
+            image = np.asarray(Image.open(image)).astype(np.float32)
         else:
-            raise NotImplementedError("use pillow or cv2")
+            raise NotImplementedError("use pillow or cv2 or uint16")
         if self.to_gray:
             image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
         return image
 
-    def _process_image_(self, image: np.ndarray) -> torch.Tensor:
+    def _process_image_(self, image: np.ndarray, mask=None) -> torch.Tensor:
         """Process image, including transforms, etc.
 
         Args:
             image (np.ndarray): Image in np.ndarray format.
+            mask (np.ndarray): Mask in np.ndarray format.
 
         Returns:
             torch.Tensor: Image prepared for dataloader.
         """
-
+        
         if self.transforms:
-            image = self.transforms(image=image)["image"]
-        return torch.from_numpy(image).permute(2, 0, 1)
+            if mask is not None:
+                output = self.transforms(image=image, mask=mask)
+                output = (output['image'], output['mask'])
+            else:
+                output = self.transforms(image=image)["image"]
+                
+        else:
+            if len(image.shape) < 3:
+                image = np.expand_dims(image, 2)
+            output = torch.from_numpy(image).permute(2, 0, 1)
 
+        return output
+    
     def __getitem__(self, index: int) -> Any:
         raise NotImplementedError()
 

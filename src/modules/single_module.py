@@ -2,6 +2,7 @@ from typing import Any, List
 
 import hydra
 import torch
+from torchvision.utils import make_grid
 from omegaconf import DictConfig
 from torch import nn
 
@@ -175,6 +176,40 @@ class SingleLitModule(BaseLitModule):
         if "name" in batch:
             outputs.update({"names": batch["name"]})
         return outputs
+
+
+class BoneSuppressionLitModule(SingleLitModule):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        
+    def model_step(self, batch: Any, *args: Any, **kwargs: Any) -> Any:
+        x, y = batch['image'], batch['target']
+        logits = self.forward(x)
+        loss = self.loss(logits, y)
+        preds = self.output_activation(logits)
+        return loss, preds, y
+    
+    def on_validation_epoch_end(self) -> None:
+        print('sample_images')
+        # Get sample reconstruction image            
+        test_input = next(iter(self.trainer.datamodule.val_dataloader()))#['image']
+        #print(test_input)
+        #print(test_input, test_label)
+        test_input = test_input['image'].to('cuda')
+        #test_label = test_label.to(self.curr_device)
+
+        # test_input, test_label = batch
+        recons = self.model(test_input)#, labels = test_label)
+        
+        self.logger.experiment.add_image('example_images', make_grid(recons, nrow = 5, normalize = True), self.current_epoch)
+    
+    def predict_step(
+        self, batch: Any, batch_idx: int, dataloader_idx: int = 0
+    ) -> Any:
+        x, y = batch
+        logits = self.forward(x["image"])
+        preds = self.output_activation(logits)
+        return {"logits": logits, "preds": preds, "targets": y}
 
 
 class MNISTLitModule(SingleLitModule):

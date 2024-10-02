@@ -213,8 +213,8 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 @hydra.main(**_HYDRA_PARAMS)
 def main(cfg: DictConfig) -> Optional[float]:
     
-    #print(cfg)
-    task = Task.init(task_name="MNIST_OPTUNA", project_name="MNIST_OPTUNA_Example")
+    print(cfg)
+    task = Task.init(task_name="Bone_Suppression_OPTUNA", project_name="Bone_Suppression")
     task.execute_remotely(queue_name='default', exit_process=True)
     
     # train the model

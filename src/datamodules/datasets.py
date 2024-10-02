@@ -1,3 +1,4 @@
+import os
 import json
 import random
 from pathlib import Path
@@ -98,6 +99,63 @@ class ClassificationDataset(BaseDataset):
         label_list = [self.annotation[key] for key in self.keys]
         weights = 1.0 / np.bincount(label_list)
         return weights.tolist()
+    
+    
+class InpaintingDataset(BaseDataset):
+    def __init__(
+        self,
+        data_path: Optional[str] = None,
+        target_path: Optional[str] = None,
+        transforms: Optional[Callable] = None,
+        read_mode: str = "uint16",
+        to_gray: bool = False,
+        include_names: bool = False,
+        label_type: str = "torch.LongTensor",
+        **kwargs: Any,
+    ) -> None:
+        """InpaintingDataset.
+
+        Args:
+            data_path (:obj:`str`, optional): Path to HDF5 file or images source dir.
+            target_path (:obj:`str`, optional): Path to target images with the same filenames.
+            transforms (Callable): Transforms.
+            read_mode (str): Image read mode, `pillow` or `cv2`. Default to `pillow`.
+            to_gray (bool): Images to gray mode. Default to False.
+            include_names (bool): If True, then `__getitem__` method would return image
+                name/path value with key `name`. Default to False.
+            shuffle_on_load (bool): Deterministically shuffle the dataset on load
+                to avoid the case when Dataset slice contains only one class due to
+                annotations dict keys order. Default to True.
+            label_type (str): Label torch.tensor type. Default to torch.FloatTensor.
+            kwargs (Any): Additional keyword arguments for H5PyFile class.
+        """
+
+        super().__init__(transforms, read_mode, to_gray)
+        self.images = []
+        self.targets = []
+        
+        for img_name in os.listdir(data_path):
+            if img_name in os.listdir(target_path):
+                self.images.append(os.path.join(data_path, img_name))
+                self.targets.append(os.path.join(target_path, img_name))
+        
+        #self.transforms = transforms
+        #print(self.transforms)
+        self.include_names = include_names
+        self.label_type = label_type
+
+    def __len__(self) -> int:
+        return len(self.images)
+
+    def __getitem__(self, index: int) -> Dict[str, Any]:
+        img_path = self.images[index]
+        target_path = self.targets[index]
+        image = self._read_image_(img_path)
+        target = self._read_image_(target_path)
+        image, target = self._process_image_(image=image, mask=target)
+        if self.include_names:
+            return {"image": image.float(), "target": target.float(), "name": img_path}
+        return {"image": image.float(), "target": target.float()}
 
 
 class ClassificationVicRegDataset(ClassificationDataset):
@@ -176,3 +234,4 @@ class NoLabelsDataset(BaseDataset):
 
     def __len__(self) -> int:
         return len(self.keys)
+    

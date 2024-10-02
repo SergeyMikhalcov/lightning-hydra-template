@@ -180,3 +180,52 @@ class BaseModule(torch.nn.Module):
         model_repo: str, model_name: str, *args: Any, **kwargs: Any
     ) -> List[Any]:
         return torch.hub.help(model_repo, model_name, *args, **kwargs)
+
+if __name__=="__main__":
+    import time
+    import numpy as np
+
+    import torch.backends.cudnn as cudnn
+    cudnn.benchmark = True
+
+    def benchmark(model, input_shape=(16, 1, 1024, 1024), dtype='fp32', nwarmup=10, nruns=10):
+        input_data = torch.randn(input_shape)
+        input_data = input_data.to("cuda")
+        if dtype=='fp16':
+            input_data = input_data.half()
+
+        print("Warm up ...")
+        with torch.no_grad():
+            for _ in range(nwarmup):
+                features = model(input_data)
+        torch.cuda.synchronize()
+        print("Start timing ...")
+        timings = []
+        with torch.no_grad():
+            for i in range(1, nruns+1):
+                start_time = time.time()
+                features = model(input_data)
+                torch.cuda.synchronize()
+                end_time = time.time()
+                timings.append(end_time - start_time)
+                if i%100==0:
+                    print('Iteration %d/%d, ave batch time %.2f ms'%(i, nruns, np.mean(timings)*1000))
+
+        print("Input shape:", input_data.size())
+        print("Output features size:", features.size())
+
+        print('Average batch time: %.2f ms'%(np.mean(timings)*1000))
+    
+    for model_name in ["Unet",
+    "UnetPlusPlus",
+    "MAnet",
+    "Linknet",
+    "FPN",
+    "PSPNet",
+    ]:
+        
+       model = BaseModule(f'segmentation_models_pytorch/{model_name}', in_channels=1, classes=1).to('cuda')
+       x = torch.randn((16, 1, 1024, 1024)).to('cuda')
+       #print(model(x).shape)
+       print(f'Model - {model_name}, shape {model(x).shape}')
+       benchmark(model, input_shape=x.shape, dtype='fp32',nwarmup=1, nruns=1)

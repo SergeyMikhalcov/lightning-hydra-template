@@ -1,0 +1,83 @@
+_target_: src.datamodules.bone_shadow_suppression.BonesXRayDataModule
+
+# this config file is used for running the template default tests
+
+datasets:
+  data_path: "\\\\\aserver-images\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\JSRT\\JSRT"
+  target_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\BSE_JSRT\\BSE_JSRT"
+  train_val_test_split: [220, 20, 0]
+  seed: 42
+
+# because we split initial train + test into train + valid + test
+transforms:
+  train:
+    order: ["resize", "vertical_flip","horizontal_flip","rotate","normalize","to_tensor"]
+    resize:
+      _target_: albumentations.Resize
+      height: 256
+      width: 256
+      p: 1.0
+    vertical_flip:
+      _target_: albumentations.VerticalFlip
+      p: 0.5
+    horizontal_flip:
+      _target_: albumentations.HorizontalFlip
+      p: 0.5
+    rotate:
+      _target_: albumentations.Rotate
+      limit: [-30, 30]
+      p: 0.5
+    normalize:
+      _target_: albumentations.Normalize
+      mean: [0.0]
+      std: [1.0]
+      p: 1.0
+      max_pixel_value: 65535.0
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      always_apply: True
+    additional_targets:
+      {'mask': 'image'}
+
+  valid_test_predict:
+    order: ["normalize", "to_tensor"]
+    normalize:
+      _target_: albumentations.Normalize
+      mean: [0.0]
+      std: [1.0]
+      p: 1.0
+      max_pixel_value: 65535.0
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      always_apply: True
+    additional_targets:
+      {'mask': 'image'}
+
+loaders:
+  train:
+    batch_size: 110
+    shuffle: True
+    num_workers: 0
+    drop_last: True
+    pin_memory: False
+
+  valid:
+    batch_size: 128
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False
+
+  test:
+    batch_size: 128
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False
+
+  predict:
+    batch_size: 128
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False

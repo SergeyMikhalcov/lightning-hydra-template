@@ -1,0 +1,63 @@
+_target_: src.datamodules.batteray_datamodule.BatteRayDataModule
+
+# this config file is used for running the template default tests
+
+datasets:
+  data_dir: "F:\BatterayNotSorted\Unreco"
+  train_val_test_split: [60_000, 6_000, 10_000]
+  seed: 42
+
+# because we split initial train + test into train + valid + test
+transforms:
+  train:
+    order: ["normalize", "to_tensor"]
+    normalize:
+      _target_: albumentations.Normalize
+      mean: [0.0]
+      std: [1.0]
+      p: 1.0
+      max_pixel_value: 65535.0
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      always_apply: True
+
+  valid_test_predict:
+    order: ["normalize", "to_tensor"]
+    normalize:
+      _target_: albumentations.Normalize
+      mean: [0.0]
+      std: [1.0]
+      p: 1.0
+      max_pixel_value: 65535.0
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      always_apply: True
+
+loaders:
+  train:
+    batch_size: 128
+    shuffle: True
+    num_workers: 0
+    drop_last: True
+    pin_memory: False
+
+  valid:
+    batch_size: 128
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False
+
+  test:
+    batch_size: 128
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False
+
+  predict:
+    batch_size: 128
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False

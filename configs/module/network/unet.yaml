@@ -1,0 +1,24 @@
+# this config file is used for running the template default tests
+
+model:
+  _target_: src.modules.models.segmentation.Segmentation
+  model_name: segmentation_models_pytorch/Unet
+  num_classes: 1
+  in_channels: 1
+  encoder_name: "resnet50"
+
+loss:
+  _target_: "torch.nn.MSELoss"
+
+metrics:
+  main: 
+    _target_: "torchmetrics.MeanSquaredError"
+    # task: "multiclass"
+    # num_classes: 1
+    # top_k: 1
+  valid_best:
+    _target_: "torchmetrics.MaxMetric"
+
+output_activation:
+  _target_: "torch.softmax"
+  dim: 1
