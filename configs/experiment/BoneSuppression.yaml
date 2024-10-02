@@ -29,11 +29,11 @@ module:
 datamodule:
   loaders:
     train:
-      batch_size: 110
+      batch_size: 20
     valid:
-      batch_size: 110
+      batch_size: 20
     test:
-      batch_size: 110
+      batch_size: 20
 
 logger:
   wandb:
