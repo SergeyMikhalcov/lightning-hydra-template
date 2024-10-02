@@ -3,8 +3,8 @@ _target_: src.datamodules.bone_shadow_suppression.BonesXRayDataModule
 # this config file is used for running the template default tests
 
 datasets:
-  data_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\JSRT\\JSRT"
-  target_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\BSE_JSRT\\BSE_JSRT"
+  data_path: "\\media\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\JSRT\\JSRT"
+  target_path: "\\media\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\BSE_JSRT\\BSE_JSRT"
   train_val_test_split: [220, 20, 0]
   seed: 42
 
