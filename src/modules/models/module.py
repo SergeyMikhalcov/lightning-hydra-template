@@ -1,5 +1,6 @@
 from functools import reduce
 from typing import Any, List, Optional, Union
+import custom
 
 import segmentation_models_pytorch as seg_models
 import timm
@@ -155,6 +156,9 @@ class BaseModule(torch.nn.Module):
             if not model_repo:
                 raise ValueError("Please provide model_repo for torch.hub")
             self.model = torch.hub.load(model_repo, model_name, **kwargs)
+        elif "custom" in model_name:
+            model_name = model_name.split("custom/")[1]
+            self.model = getattr(custom, model_name)(**kwargs)
         else:
             raise NotImplementedError(f"Model {model_name} is not implemented")
 
@@ -216,16 +220,20 @@ if __name__=="__main__":
 
         print('Average batch time: %.2f ms'%(np.mean(timings)*1000))
     
-    for model_name in ["Unet",
-    "UnetPlusPlus",
-    "MAnet",
-    "Linknet",
-    "FPN",
-    "PSPNet",
-    ]:
+    # for model_name in ["Unet",
+    # "UnetPlusPlus",
+    # "MAnet",
+    # "Linknet",
+    # "FPN",
+    # "PSPNet",
+    # ]:
         
-       model = BaseModule(f'segmentation_models_pytorch/{model_name}', in_channels=1, classes=1).to('cuda')
-       x = torch.randn((16, 1, 1024, 1024)).to('cuda')
-       #print(model(x).shape)
-       print(f'Model - {model_name}, shape {model(x).shape}')
-       benchmark(model, input_shape=x.shape, dtype='fp32',nwarmup=1, nruns=1)
+    #    model = BaseModule(f'segmentation_models_pytorch/{model_name}', in_channels=1, classes=1).to('cuda')
+    #    x = torch.randn((16, 1, 256, 256)).to('cuda')
+    #    #print(model(x).shape)
+    #    print(f'Model - {model_name}, shape {model(x).shape}')
+    #    benchmark(model, input_shape=x.shape, dtype='fp32',nwarmup=10, nruns=10)
+    model = BaseModule(f'segmentation_models_pytorch/Unet', in_channels=1, classes=1, encoder_depth=7, decoder_channels=(2, 4, 8, 16, 32, 64, 128)).to('cuda')
+    print(model)
+    # x = torch.randn((16, 1, 256, 256)).to('cuda')
+    #print(model(x).shape)
