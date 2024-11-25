@@ -13,27 +13,27 @@ defaults:
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
-tags: ["BoneSuppression", "UNet", "256x256"]
+tags: ["BoneSuppression", "UNet", "Adam", "2048x2048"]
 
 seed: 12345
 
 trainer:
   min_epochs: 10
-  max_epochs: 1000
+  max_epochs: 200
   gradient_clip_val: 0.5
 
 module:
   optimizer:
-    lr: 0.001
+    lr: 0.0003
 
 datamodule:
   loaders:
     train:
-      batch_size: 20
+      batch_size: 1
     valid:
-      batch_size: 20
+      batch_size: 1
     test:
-      batch_size: 20
+      batch_size: 1
 
 logger:
   wandb:

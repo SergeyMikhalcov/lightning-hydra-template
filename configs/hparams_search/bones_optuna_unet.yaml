@@ -40,7 +40,7 @@ hydra:
     n_jobs: 1
 
     # 'minimize' or 'maximize' the objective
-    direction: maximize
+    direction: minimize
 
     # total number of runs that will be executed
     n_trials: 20
@@ -55,4 +55,4 @@ hydra:
 
     # define hyperparameter search space
     params:
-      module.optimizer.lr: interval(0.0001, 0.5)
+      module.optimizer.lr: interval(0.000001, 0.05)

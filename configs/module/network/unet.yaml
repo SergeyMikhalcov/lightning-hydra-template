@@ -2,23 +2,23 @@
 
 model:
   _target_: src.modules.models.segmentation.Segmentation
-  model_name: segmentation_models_pytorch/Unet
-  num_classes: 1
+  model_name: custom/Unet
   in_channels: 1
-  encoder_name: "resnet50"
+  out_channels: 1
+  features: [6, 12, 24, 48, 96, 192, 384]
 
 loss:
   _target_: "torch.nn.MSELoss"
 
 metrics:
   main: 
-    _target_: "torchmetrics.MeanSquaredError"
+    _target_: "torchmetrics.regression.MeanSquaredError"
     # task: "multiclass"
     # num_classes: 1
     # top_k: 1
   valid_best:
-    _target_: "torchmetrics.MaxMetric"
+    _target_: "torchmetrics.MinMetric"
 
 output_activation:
-  _target_: "torch.softmax"
-  dim: 1
+  _target_: "torch.sigmoid"
+  # dim: 1

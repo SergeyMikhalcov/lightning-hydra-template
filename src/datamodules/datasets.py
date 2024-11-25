@@ -106,10 +106,11 @@ class InpaintingDataset(BaseDataset):
         self,
         data_path: Optional[str] = None,
         target_path: Optional[str] = None,
+        mask_path: Optional[str] = None,
         transforms: Optional[Callable] = None,
         read_mode: str = "uint16",
         to_gray: bool = False,
-        include_names: bool = False,
+        include_names: bool = True,
         label_type: str = "torch.LongTensor",
         **kwargs: Any,
     ) -> None:
@@ -133,11 +134,14 @@ class InpaintingDataset(BaseDataset):
         super().__init__(transforms, read_mode, to_gray)
         self.images = []
         self.targets = []
+        self.masks = []
         
         for img_name in os.listdir(data_path):
             if img_name in os.listdir(target_path):
                 self.images.append(os.path.join(data_path, img_name))
                 self.targets.append(os.path.join(target_path, img_name))
+            if mask_path and img_name in os.listdir(mask_path):
+                self.masks.append(os.path.join(mask_path, img_name))
         
         #self.transforms = transforms
         #print(self.transforms)
@@ -153,10 +157,15 @@ class InpaintingDataset(BaseDataset):
         image = self._read_image_(img_path)
         target = self._read_image_(target_path)
         image, target = self._process_image_(image=image, mask=target)
+        output = {"image": image.float(), "target": target.float()}
         if self.include_names:
-            return {"image": image.float(), "target": target.float(), "name": img_path}
-        return {"image": image.float(), "target": target.float()}
-
+            output["name"] = img_path
+        if len(self.masks):
+            mask_path = self.masks[index]
+            mask = self._read_image_(mask_path)
+            mask[mask==255] = 1.0
+            output["mask"] = torch.Tensor(mask).unsqueeze(0).unsqueeze(0)
+        return output
 
 class ClassificationVicRegDataset(ClassificationDataset):
     def __init__(self, *args: Any, **kwargs: Any) -> None:

@@ -30,8 +30,10 @@ class BonesXRayDataModule(SingleDataModule):
             train_set = InpaintingDataset(
                 data_path = self.cfg_datasets.get("data_path"),
                 target_path = self.cfg_datasets.get("target_path"),  
+                mask_path=self.cfg_datasets.get("mask_path"),
                 read_mode = "uint16",
                 transforms=transforms_train,
+                include_names=True
             )
             seed = self.cfg_datasets.get("seed")
             self.train_set, self.valid_set, self.test_set = random_split(
