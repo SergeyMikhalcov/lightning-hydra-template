@@ -5,10 +5,10 @@ _target_: src.datamodules.bone_shadow_suppression.BonesXRayDataModule
 datasets:
   # data_path: "/media/images/ОРПО/MEDICINE/JSRT_dataset/archive/JSRT/JSRT"
   # target_path: "/media/images/ОРПО/MEDICINE/JSRT_dataset/archive/BSE_JSRT/BSE_JSRT"
-  # data_path: "/media/images/ОРПО/MEDICINE/JSRT_dataset/archive/JSRT/JSRT_4096_normalized_mixup"
-  # target_path: "/media/images/ОРПО/MEDICINE/JSRT_dataset/archive/BSE_JSRT/BSE_JSRT_4096_normalized_mixup"
-  data_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\DataSets\\JSRT_dataset\\archive\\JSRT\\JSRT_4096_normalized_mixup"
-  target_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\DataSets\\JSRT_dataset\\archive\\BSE_JSRT\\BSE_JSRT_4096_normalized_mixup"
+  data_path: "/media/images/ОРПО/MEDICINE/DataSets/JSRT_dataset/archive/JSRT/JSRT_4096_normalized_mixup"
+  target_path: "/media/images/ОРПО/MEDICINE/DataSets/JSRT_dataset/archive/BSE_JSRT/BSE_JSRT_4096_normalized_mixup"
+  # data_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\DataSets\\JSRT_dataset\\archive\\JSRT\\JSRT_4096_normalized_mixup"
+  # target_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\DataSets\\JSRT_dataset\\archive\\BSE_JSRT\\BSE_JSRT_4096_normalized_mixup"
   # data_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\JSRT\\JSRT_8bit_mixup"
   # target_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\BSE_JSRT\\BSE_JSRT_8bit_mixup"
   # data_path: "\\\\aserver-images\\images\\ОРПО\\MEDICINE\\JSRT_dataset\\archive\\JSRT\\JSRT_8bit"
@@ -20,17 +20,17 @@ datasets:
 # because we split initial train + test into train + valid + test
 transforms:
   train:
-    #order: ["rotate","resize", "vertical_flip", "horizontal_flip", "normalize", "to_tensor"]
-    order: ["resize", "normalize", "to_tensor"]
+    order: ["rotate","resize", "vertical_flip", "horizontal_flip", "normalize", "to_tensor"]
+    # order: ["resize", "normalize", "to_tensor"]
     resize:
       _target_: albumentations.Resize
-      height: 2048
-      width: 2048
+      height: 1536
+      width: 1536
       p: 1.0
     random_crop:
       _target_: albumentations.RandomCrop 
-      height: 2048
-      width: 2048
+      height: 1536
+      width: 1536
       p: 1.0
     vertical_flip:
       _target_: albumentations.VerticalFlip
@@ -58,8 +58,8 @@ transforms:
     order: ["resize", "normalize", "to_tensor"]
     resize:
       _target_: albumentations.Resize
-      height: 2048
-      width: 2048
+      height: 1536
+      width: 1536
       p: 1.0
     normalize:
       _target_: albumentations.Normalize
@@ -75,14 +75,14 @@ transforms:
 
 loaders:
   train:
-    batch_size: 1
+    batch_size: 2
     shuffle: True
     num_workers: 0
     drop_last: True
     pin_memory: False
 
   valid:
-    batch_size: 1
+    batch_size: 6
     shuffle: False
     num_workers: 0
     drop_last: False

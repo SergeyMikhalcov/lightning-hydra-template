@@ -18,7 +18,7 @@ defaults:
 # Use quotes for defining internal value in ${replace:"..."} to avoid
 # grammar problems with hydra config parser.
 
-optimized_metric: "MSELoss/valid"
+optimized_metric: "SSIMLoss/valid"
 
 # here we define Optuna hyperparameter search
 # it optimizes for value returned from function with @hydra.main decorator

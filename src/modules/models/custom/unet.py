@@ -54,7 +54,6 @@ class Unet(nn.Module):
             x = self.pool(x)
 
         x = self.bottleneck(x)
-        print('After bottleneck', x.shape)
         skip_connections = skip_connections[::-1]
 
         for idx in range(0, len(self.ups), 2):

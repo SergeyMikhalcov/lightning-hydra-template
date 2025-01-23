@@ -214,7 +214,7 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 def main(cfg: DictConfig) -> Optional[float]:
     
     print(cfg)
-    task = Task.init(task_name="Bone_Suppression_OPTUNA", project_name="Bone_Suppression")
+    task = Task.init(task_name="GlassScan", project_name="Glass_Scan")
     task.execute_remotely(queue_name='default', exit_process=True)
     
     # train the model
