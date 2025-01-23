@@ -16,7 +16,7 @@ class Segmentation(BaseModule):
     def __init__(
         self,
         model_name: str,
-        num_classes: int,
+        #num_classes: int,
         model_repo: Optional[str] = None,
         freeze_layers: Any = None,
         **kwargs: Any,
@@ -35,7 +35,7 @@ class Segmentation(BaseModule):
         #     self.model, head, nn.Linear(in_features, num_classes, bias=True)
         # )
         print(self.model)
-        self.num_classes = num_classes
+        #self.num_classes = num_classes
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.model(x)

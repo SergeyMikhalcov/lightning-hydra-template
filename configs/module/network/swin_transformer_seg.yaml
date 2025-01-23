@@ -26,6 +26,7 @@ model:
 
 loss:
   _target_: "segmentation_models_pytorch.losses.DiceLoss"
+  mode: 'binary'
 
 metrics:
   main: 
