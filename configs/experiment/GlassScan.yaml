@@ -4,9 +4,9 @@
 # python train.py experiment=example
 
 defaults:
-  - override /datamodule: BoneSuppression.yaml
-  - override /module: unet.yaml
-  - override /callbacks: bones.yaml
+  - override /datamodule: GlassScan.yaml
+  - override /module: swintransformer.yaml
+  - override /callbacks: glassscan.yaml
   - override /trainer: gpu.yaml
   - override /logger: tensorboard.yaml
 

@@ -10,7 +10,7 @@ model:
   embed_dim: 48 
   depths: [2, 2, 2, 2]
   depths_decoder: [1, 2, 2, 2]
-  num_heads: [3, 6, 12, 24],
+  num_heads: [3, 6, 12, 24]
   window_size: 16
   mlp_ratio: 4.
   qkv_bias: True
@@ -25,12 +25,12 @@ model:
   final_upsample: "expand_first"
 
 loss:
-  _target_: "kornia.losses.dice_loss"
+  _target_: "kornia.losses.DiceLoss"
 
 metrics:
   main: 
     _target_: "torchmetrics.classification.JaccardIndex"
-    # task: "multiclass"
+    task: "binary"
     # num_classes: 1
     # top_k: 1
   valid_best:
