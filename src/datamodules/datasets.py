@@ -136,12 +136,24 @@ class InpaintingDataset(BaseDataset):
         self.targets = []
         self.masks = []
         
-        for img_name in os.listdir(data_path):
-            if img_name in os.listdir(target_path):
-                self.images.append(os.path.join(data_path, img_name))
-                self.targets.append(os.path.join(target_path, img_name))
-            if mask_path and img_name in os.listdir(mask_path):
-                self.masks.append(os.path.join(mask_path, img_name))
+        for a in os.walk(self.data_path):
+            if len(a[2]):
+                for img in a[2]:
+                    self.images.append(os.path.join(a[0], img))
+                    self.targets.append(os.path.join(a[0],
+                                                     img).replace(data_path,
+                                                                  target_path))
+                    if mask_path:
+                        self.masks.append(os.path.join(a[0],
+                                                     img).replace(data_path,
+                                                                  mask_path))
+
+        # for img_name in os.listdir(data_path):
+        #     if img_name in os.listdir(target_path):
+        #         self.images.append(os.path.join(data_path, img_name))
+        #         self.targets.append(os.path.join(target_path, img_name))
+        #     if mask_path and img_name in os.listdir(mask_path):
+        #         self.masks.append(os.path.join(mask_path, img_name))
         
         #self.transforms = transforms
         #print(self.transforms)

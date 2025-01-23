@@ -23,6 +23,7 @@ tensorboard
 # comet-ml
 
 # --------- others --------- #
+kornia
 einops
 pyrootutils
 pre-commit

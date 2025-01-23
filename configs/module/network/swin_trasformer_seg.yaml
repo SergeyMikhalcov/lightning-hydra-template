@@ -1,0 +1,42 @@
+# this config file is used for running the template default tests
+
+model:
+  _target_: src.modules.models.segmentation.Segmentation
+  model_name: custom/SwinTransformer
+  img_size: [256, 4096]
+  patch_size: [4, 4]
+  in_chans: 3 
+  num_classes: 1
+  embed_dim: 48 
+  depths: [2, 2, 2, 2]
+  depths_decoder: [1, 2, 2, 2]
+  num_heads: [3, 6, 12, 24],
+  window_size: 16
+  mlp_ratio: 4.
+  qkv_bias: True
+  # qk_scale: None
+  drop_rate: 0.
+  attn_drop_rate: 0.
+  drop_path_rate: 0.1
+  # norm_layer=nn.LayerNorm, 
+  ape: False
+  patch_norm: True
+  use_checkpoint: False
+  final_upsample: "expand_first"
+
+loss:
+  _target_: "kornia.losses.dice_loss"
+
+metrics:
+  main: 
+    _target_: "torchmetrics.classification.JaccardIndex"
+    # task: "multiclass"
+    # num_classes: 1
+    # top_k: 1
+  valid_best:
+    _target_: "torchmetrics.MaxMetric"
+    
+
+output_activation:
+  _target_: "torch.sigmoid"
+  # dim: 1

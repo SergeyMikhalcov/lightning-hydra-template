@@ -1,0 +1,42 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=example
+
+defaults:
+  - override /datamodule: BoneSuppression.yaml
+  - override /module: unet.yaml
+  - override /callbacks: bones.yaml
+  - override /trainer: gpu.yaml
+  - override /logger: tensorboard.yaml
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+tags: ["GlassScan", "SwinTransformer", "SGD", "DataSet_v0.1"]
+
+seed: 12345
+
+trainer:
+  min_epochs: 10
+  max_epochs: 5000
+  gradient_clip_val: 0.5
+  accumulate_grad_batches: 5
+
+module:
+  optimizer:
+    lr: 0.0001
+
+datamodule:
+  loaders:
+    train:
+      batch_size: 4
+    valid:
+      batch_size: 4
+    test:
+      batch_size: 1
+
+logger:
+  wandb:
+    tags: ${tags}
+    group: "glass_scan"

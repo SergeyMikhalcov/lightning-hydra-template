@@ -1,6 +1,6 @@
 from functools import reduce
 from typing import Any, List, Optional, Union
-import custom
+from src.modules.models import custom
 
 import segmentation_models_pytorch as seg_models
 import timm
@@ -233,7 +233,13 @@ if __name__=="__main__":
     #    #print(model(x).shape)
     #    print(f'Model - {model_name}, shape {model(x).shape}')
     #    benchmark(model, input_shape=x.shape, dtype='fp32',nwarmup=10, nruns=10)
-    model = BaseModule(f'segmentation_models_pytorch/Unet', in_channels=1, classes=1, encoder_depth=7, decoder_channels=(2, 4, 8, 16, 32, 64, 128)).to('cuda')
+    #model = BaseModule(f'custom/Unet', in_channels=1, out_channels=1, features=(2, 4, 8, 16, 32, 64, 128)).to('cuda')
+    model = BaseModule('custom/SwinTransformer', img_size=(256, 4096), patch_size=(4, 4), num_classes=1, in_chans=3,
+                 embed_dim=48, depths=[2, 2, 2, 2], depths_decoder=[1, 2, 2, 2], num_heads=[3, 6, 12, 24],
+                 window_size=16, mlp_ratio=4., qkv_bias=True, qk_scale=None,
+                 drop_rate=0., attn_drop_rate=0., drop_path_rate=0.1,
+                 norm_layer=nn.LayerNorm, ape=False, patch_norm=True,
+                 use_checkpoint=False, final_upsample="expand_first")
     print(model)
     # x = torch.randn((16, 1, 256, 256)).to('cuda')
     #print(model(x).shape)
