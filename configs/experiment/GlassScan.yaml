@@ -30,7 +30,7 @@ module:
 datamodule:
   loaders:
     train:
-      batch_size: 4
+      batch_size: 2
     valid:
       batch_size: 4
     test:

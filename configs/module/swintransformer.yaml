@@ -29,7 +29,7 @@ scheduler:
     patience: 10
     verbose: True
   extras:
-    monitor: "SSIMLoss/valid"
+    monitor: "DiceLoss/valid"
     interval: "epoch"
     frequency: 1
 

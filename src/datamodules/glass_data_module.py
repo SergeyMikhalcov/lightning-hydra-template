@@ -25,7 +25,7 @@ class GlassDataModule(SingleDataModule):
                 data_path = self.cfg_datasets.get("train_data_path"),
                 target_path = self.cfg_datasets.get("train_target_path"),  
                 mask_path=None,
-                read_mode = "Pillow",
+                read_mode = "pillow",
                 transforms=transforms_train,
                 include_names=True
             )
@@ -34,7 +34,7 @@ class GlassDataModule(SingleDataModule):
                 data_path = self.cfg_datasets.get("val_data_path"),
                 target_path = self.cfg_datasets.get("val_target_path"),  
                 mask_path=None,
-                read_mode = "Pillow",
+                read_mode = "pillow",
                 transforms=transforms_test,
                 include_names=True
             )

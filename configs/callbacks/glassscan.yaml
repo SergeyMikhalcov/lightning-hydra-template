@@ -7,8 +7,8 @@ swa:
 model_checkpoint:
   _target_: pytorch_lightning.callbacks.ModelCheckpoint
   dirpath: ${paths.output_dir}/checkpoints # directory to save the model file
-  filename: ${replace:"epoch{epoch:03d}-loss_valid{SSIMLoss/valid:.4f}-metric_valid{MeanSquaredError/valid:.4f}"} # checkpoint filename
-  monitor: ${replace:"SSIMLoss/valid"} # name of the logged metric which determines when model is improving
+  filename: ${replace:"epoch{epoch:03d}-loss_valid{DiceLoss/valid:.4f}-metric_valid{JaccardIndex/valid:.4f}"} # checkpoint filename
+  monitor: ${replace:"DiceLoss/valid"} # name of the logged metric which determines when model is improving
   verbose: False # verbosity mode
   save_last: True # additionally always save an exact copy of the last checkpoint to a file last.ckpt
   save_top_k: 5 # save k best models (determined by above metric)
@@ -22,7 +22,7 @@ model_checkpoint:
 
 early_stopping:
   _target_: pytorch_lightning.callbacks.EarlyStopping
-  monitor: ${replace:"SSIMLoss/valid"} # quantity to be monitored, must be specified !!!
+  monitor: ${replace:"DiceLoss/valid"} # quantity to be monitored, must be specified !!!
   min_delta: 1.0e-6 # minimum change in the monitored quantity to qualify as an improvement
   patience: 10 # number of checks with no improvement after which training will be stopped
   verbose: False # verbosity mode

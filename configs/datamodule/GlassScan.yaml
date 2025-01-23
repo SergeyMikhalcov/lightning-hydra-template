@@ -30,7 +30,7 @@ transforms:
       _target_: albumentations.GaussianBlur
       p: .05
     motion_blur:
-      _ target_: albumentations.MotionBlur
+      _target_: albumentations.MotionBlur
       p: .05
     resize:
       _target_: albumentations.Resize
@@ -90,7 +90,7 @@ transforms:
 
 loaders:
   train:
-    batch_size: 4
+    batch_size: 2
     shuffle: True
     num_workers: 0
     drop_last: True

@@ -136,7 +136,7 @@ class InpaintingDataset(BaseDataset):
         self.targets = []
         self.masks = []
         
-        for a in os.walk(self.data_path):
+        for a in os.walk(data_path):
             if len(a[2]):
                 for img in a[2]:
                     self.images.append(os.path.join(a[0], img))

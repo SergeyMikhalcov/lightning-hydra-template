@@ -25,7 +25,7 @@ model:
   final_upsample: "expand_first"
 
 loss:
-  _target_: "kornia.losses.DiceLoss"
+  _target_: "segmentation_models_pytorch.losses.DiceLoss"
 
 metrics:
   main: 
