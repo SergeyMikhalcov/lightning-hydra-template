@@ -39,8 +39,8 @@ class GlassDataModule(SingleDataModule):
                 include_names=True
             )
             
-            self.train_set.transforms = transforms_train
-            self.valid_set.transforms = transforms_test
+        self.train_set.transforms = transforms_train
+        self.valid_set.transforms = transforms_test
             # self.test_set.transforms = transforms_test
             # print(self.train_set.transforms)
             # print(self.valid_set.transforms)
