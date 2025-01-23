@@ -60,7 +60,7 @@ transforms:
       max_pixel_value: 255.0
     to_tensor:
       _target_: albumentations.pytorch.ToTensorV2
-      always_apply: True
+      p: 1.0
     additional_targets:
       {'mask': 'image'}
 
@@ -84,7 +84,7 @@ transforms:
       max_pixel_value: 255.0
     to_tensor:
       _target_: albumentations.pytorch.ToTensorV2
-      always_apply: True
+      p: 1.0
     additional_targets:
       {'mask': 'image'}
 
