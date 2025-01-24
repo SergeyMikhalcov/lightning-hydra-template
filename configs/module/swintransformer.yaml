@@ -1,4 +1,4 @@
-_target_: src.modules.single_module.BoneSuppressionLitModule
+_target_: src.modules.single_module.SegmentationLitModule
 
 # this config file is used for running the template default tests
 

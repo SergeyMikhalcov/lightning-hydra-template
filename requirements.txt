@@ -5,7 +5,7 @@
 
 torch==2.0.0+cu118
 torchvision==0.15.0+cu118
-torchmetrics==1.0.3
+torchmetrics
 pytorch-lightning
 torchsummary
 

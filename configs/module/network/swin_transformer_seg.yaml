@@ -30,9 +30,9 @@ loss:
 
 metrics:
   main: 
-    _target_: "torchmetrics.classification.JaccardIndex"
-    task: "binary"
-    # num_classes: 1
+    _target_: "torchmetrics.segmentation.MeanIoU"
+    # task: "binary"
+    num_classes: 1
     # top_k: 1
   valid_best:
     _target_: "torchmetrics.MaxMetric"

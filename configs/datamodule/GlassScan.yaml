@@ -61,8 +61,8 @@ transforms:
     to_tensor:
       _target_: albumentations.pytorch.ToTensorV2
       p: 1.0
-    additional_targets:
-      {'mask': 'image'}
+    # additional_targets:
+    #   {'mask': 'image'}
 
   valid_test_predict:
     order: ["random_crop", "normalize", "to_tensor"]
@@ -85,12 +85,12 @@ transforms:
     to_tensor:
       _target_: albumentations.pytorch.ToTensorV2
       p: 1.0
-    additional_targets:
-      {'mask': 'image'}
+    # additional_targets:
+    #   {'mask': 'image'}
 
 loaders:
   train:
-    batch_size: 2
+    batch_size: 4
     shuffle: True
     num_workers: 0
     drop_last: True
