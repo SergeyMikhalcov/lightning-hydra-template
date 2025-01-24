@@ -51,12 +51,44 @@ class BaseDataset(Dataset):
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         elif self.read_mode == "uint16":
             image = np.asarray(Image.open(image)).astype(np.float32)
+        elif self.read_mode == "mask":
+            image = cv2.imread(image, cv2.IMREAD_UNCHANGED)
         else:
-            raise NotImplementedError("use pillow or cv2 or uint16")
+            raise NotImplementedError("use pillow or cv2 or uint16 or mask")
         if self.to_gray:
             image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
         return image
+    
+    def _read_image_with_mode(self, image: Any, read_mode: str) -> np.ndarray:
+        """Read image from source.
+
+        Args:
+            image (Any): Image source. Could be str, Path or bytes.
+
+        Returns:
+            np.ndarray: Loaded image.
+        """
+
+        if read_mode == "pillow":
+            if not isinstance(image, (str, Path)):
+                image = io.BytesIO(image)
+            image = np.asarray(Image.open(image).convert("RGB"))
+        elif read_mode == "cv2":
+            if not isinstance(image, (str, Path)):
+                image = np.frombuffer(image, np.uint8)
+                image = cv2.imdecode(image, cv2.COLOR_RGB2BGR)
+            else:
+                image = cv2.imread(image)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        elif read_mode == "uint16":
+            image = np.asarray(Image.open(image)).astype(np.float32)
+        elif read_mode == "mask":
+            image = np.asarray(Image.open(image))
+        else:
+            raise NotImplementedError("use pillow or cv2 or uint16 or mask")
+        return image
+
 
     def _process_image_(self, image: np.ndarray, mask=None) -> torch.Tensor:
         """Process image, including transforms, etc.

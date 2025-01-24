@@ -116,13 +116,14 @@ class SingleLitModule(BaseLitModule):
 
     def validation_step(self, batch: Any, batch_idx: int) -> Any:
         loss, preds, targets = self.model_step(batch, batch_idx)
+
         self.log(
             f"{self.loss.__class__.__name__}/valid",
             loss,
             **self.logging_params,
         )
 
-        self.valid_metric(preds, targets)
+        self.valid_metric(preds.int(), targets)
         self.log(
             f"{self.valid_metric.__class__.__name__}/valid",
             self.valid_metric,
@@ -188,6 +189,83 @@ class BoneSuppressionLitModule(SingleLitModule):
         loss = self.loss(logits, y)
         preds = self.output_activation(logits)
         return loss, preds, y
+    
+    def on_validation_epoch_end(self) -> None:
+        print('sample_images')
+        # Get sample reconstruction image            
+        test_input = next(iter(self.trainer.datamodule.val_dataloader()))#['image']
+        #print(test_input)
+        #print(test_input, test_label)
+        test_input = test_input['image'].to('cuda')
+        #test_label = test_label.to(self.curr_device)
+
+        # test_input, test_label = batch
+        recons = self.model(test_input)#, labels = test_label)
+        
+        self.logger.experiment.add_image('example_images', make_grid(recons, nrow = 5, normalize = True), self.current_epoch)
+    
+    def predict_step(
+        self, batch: Any, batch_idx: int, dataloader_idx: int = 0
+    ) -> Any:
+        x, y = batch
+        logits = self.forward(x["image"])
+        preds = self.output_activation(logits)
+        return {"logits": logits, "preds": preds, "targets": y}
+
+class SegmentationLitModule(SingleLitModule):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        
+    def model_step(self, batch: Any, *args: Any, **kwargs: Any) -> Any:
+        x, y = batch['image'], batch['target']
+        logits = self.forward(x)
+        loss = self.loss(logits, y)
+        preds = self.output_activation(logits)
+        return loss, preds, y
+    
+    def training_step(self, batch: Any, batch_idx: int) -> Any:
+        loss, preds, targets = self.model_step(batch, batch_idx)
+        self.log(
+            f"{self.loss.__class__.__name__}/train",
+            loss,
+            **self.logging_params,
+        )
+        preds = preds > 0.5
+        self.train_metric(preds.int(), targets)
+        self.log(
+            f"{self.train_metric.__class__.__name__}/train",
+            self.train_metric,
+            **self.logging_params,
+        )
+
+        self.train_add_metrics(preds, targets)
+        self.log_dict(self.train_add_metrics, **self.logging_params)
+
+        # Lightning keeps track of `training_step` outputs and metrics on GPU for
+        # optimization purposes. This works well for medium size datasets, but
+        # becomes an issue with larger ones. It might show up as a CPU memory leak
+        # during training step. Keep it in mind.
+        return {"loss": loss}
+    
+    def validation_step(self, batch: Any, batch_idx: int) -> Any:
+        loss, preds, targets = self.model_step(batch, batch_idx)
+        
+        self.log(
+            f"{self.loss.__class__.__name__}/valid",
+            loss,
+            **self.logging_params,
+        )
+        preds = preds > 0.5
+        self.valid_metric(preds.int(), targets)
+        self.log(
+            f"{self.valid_metric.__class__.__name__}/valid",
+            self.valid_metric,
+            **self.logging_params,
+        )
+
+        self.valid_add_metrics(preds, targets)
+        self.log_dict(self.valid_add_metrics, **self.logging_params)
+        return {"loss": loss}
     
     def on_validation_epoch_end(self) -> None:
         print('sample_images')

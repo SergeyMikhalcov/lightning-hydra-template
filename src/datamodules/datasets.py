@@ -167,9 +167,9 @@ class InpaintingDataset(BaseDataset):
         img_path = self.images[index]
         target_path = self.targets[index]
         image = self._read_image_(img_path)
-        target = self._read_image_(target_path)
+        target = self._read_image_with_mode(target_path, read_mode='mask')
         image, target = self._process_image_(image=image, mask=target)
-        output = {"image": image.float(), "target": target.float()}
+        output = {"image": image.float(), "target": np.expand_dims(target, axis=0)}
         if self.include_names:
             output["name"] = img_path
         if len(self.masks):
@@ -177,6 +177,7 @@ class InpaintingDataset(BaseDataset):
             mask = self._read_image_(mask_path)
             mask[mask==255] = 1.0
             output["mask"] = torch.Tensor(mask).unsqueeze(0).unsqueeze(0)
+        print(output["image"].shape, output["target"].shape)
         return output
 
 class ClassificationVicRegDataset(ClassificationDataset):
