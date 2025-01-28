@@ -232,7 +232,7 @@ class SegmentationLitModule(SingleLitModule):
             loss,
             **self.logging_params,
         )
-        self.train_metric(preds, targets)
+        self.train_metric((self.output_activation(preds) > 0.5).int(), targets)
         # preds = preds > 0.5
         # self.train_metric(preds.int(), targets)
         self.log(
@@ -242,7 +242,7 @@ class SegmentationLitModule(SingleLitModule):
         )
 
         #self.train_add_metrics(preds, targets)
-        self.train_add_metrics((self.output_activation(preds)>0.5).int(), targets)
+        self.train_add_metrics((self.output_activation(preds) > 0.5).int(), targets)
         self.log_dict(self.train_add_metrics, **self.logging_params)
 
         # Lightning keeps track of `training_step` outputs and metrics on GPU for
@@ -261,7 +261,7 @@ class SegmentationLitModule(SingleLitModule):
         )
         # preds = preds > 0.5
         # self.valid_metric(preds.int(), targets)
-        self.valid_metric(preds, targets.float().unsqueeze(1))
+        self.valid_metric((self.output_activation(preds) > 0.5).int(), targets)
         self.log(
             f"{self.valid_metric.__class__.__name__}/valid",
             self.valid_metric,
