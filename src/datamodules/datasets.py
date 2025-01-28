@@ -169,7 +169,7 @@ class InpaintingDataset(BaseDataset):
         image = self._read_image_(img_path)
         target = self._read_image_with_mode(target_path, read_mode='mask')
         image, target = self._process_image_(image=image, mask=target)
-        output = {"image": image.float(), "target": np.expand_dims(target, axis=0)}
+        output = {"image": image.float(), "target": target}
         if self.include_names:
             output["name"] = img_path
         if len(self.masks):
