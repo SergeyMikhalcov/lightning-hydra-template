@@ -20,7 +20,7 @@ seed: 12345
 trainer:
   min_epochs: 10
   max_epochs: 10000
-  gradient_clip_val: 0.5
+  gradient_clip_val: 0.25
   accumulate_grad_batches: 5
 
 module:
@@ -30,7 +30,7 @@ module:
 datamodule:
   loaders:
     train:
-      batch_size: 12
+      batch_size: 13
     valid:
       batch_size: 6
     # test:

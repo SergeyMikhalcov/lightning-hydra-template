@@ -219,7 +219,6 @@ class SegmentationLitModule(SingleLitModule):
     def model_step(self, batch: Any, *args: Any, **kwargs: Any) -> Any:
         x, y = batch['image'], batch['target']
         logits = self.forward(x)
-        print(y.shape)
         loss = self.loss(logits, y.float())
         preds = logits
         # preds = self.output_activation(logits)
@@ -232,7 +231,8 @@ class SegmentationLitModule(SingleLitModule):
             loss,
             **self.logging_params,
         )
-        self.train_metric((self.output_activation(preds) > 0.5).int(), targets)
+        preds = (self.output_activation(preds) > 0.5).int()
+        self.train_metric(preds, targets)
         # preds = preds > 0.5
         # self.train_metric(preds.int(), targets)
         self.log(
@@ -241,8 +241,7 @@ class SegmentationLitModule(SingleLitModule):
             **self.logging_params,
         )
 
-        #self.train_add_metrics(preds, targets)
-        self.train_add_metrics((self.output_activation(preds) > 0.5).int(), targets)
+        self.train_add_metrics(preds, targets)
         self.log_dict(self.train_add_metrics, **self.logging_params)
 
         # Lightning keeps track of `training_step` outputs and metrics on GPU for
@@ -261,15 +260,15 @@ class SegmentationLitModule(SingleLitModule):
         )
         # preds = preds > 0.5
         # self.valid_metric(preds.int(), targets)
-        self.valid_metric((self.output_activation(preds) > 0.5).int(), targets)
+        preds = (self.output_activation(preds) > 0.5).int()
+        self.valid_metric(preds, targets)
         self.log(
             f"{self.valid_metric.__class__.__name__}/valid",
             self.valid_metric,
             **self.logging_params,
         )
 
-        # self.valid_add_metrics(preds, targets)
-        self.valid_add_metrics((self.output_activation(preds) > 0.5).int(), targets)
+        self.valid_add_metrics(preds, targets)
         self.log_dict(self.valid_add_metrics, **self.logging_params)
         return {"loss": loss}
     
