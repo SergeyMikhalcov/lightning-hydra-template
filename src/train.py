@@ -194,14 +194,14 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
     test_metrics = trainer.callback_metrics
 
     # Save state dicts for best and last checkpoints
-    if cfg.get("save_state_dict"):
-        log.info("Starting saving state dicts!")
-        utils.save_state_dicts(
-            trainer=trainer,
-            model=model,
-            dirname=cfg.paths.output_dir,
-            **cfg.extras.state_dict_saving_params,
-        )
+    # if cfg.get("save_state_dict"):
+    #     log.info("Starting saving state dicts!")
+    #     utils.save_state_dicts(
+    #         trainer=trainer,
+    #         model=model,
+    #         dirname=cfg.paths.output_dir,
+    #         **cfg.extras.state_dict_saving_params,
+    #     )
 
     # merge train and test metrics
     metric_dict = {**train_metrics, **test_metrics}

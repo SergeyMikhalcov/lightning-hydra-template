@@ -5,16 +5,17 @@ _target_: src.datamodules.glass_data_module.GlassDataModule
 datasets:
   train_data_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/train/data"
   train_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/train/sem_seg_cardboard"
-  val_data_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/train/data"
-  val_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/train/sem_seg_cardboard"
+  val_data_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/val/data"
+  val_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/val/sem_seg_cardboard"
 
 
 # because we split initial train + test into train + valid + test
 transforms:
   train:
-    order: ["rotate","random_crop", "vertical_flip", 
-            "horizontal_flip", "random_brightness_contrast",
-            "gaussian_noise", "gaussian_blur", "motion_blur",
+    order: ["rotate", "random_crop", "vertical_flip", 
+            "horizontal_flip", 
+            # "random_brightness_contrast",
+            # "gaussian_noise", "gaussian_blur", "motion_blur",
             "normalize", "to_tensor"]
     # order: ["resize", "normalize", "to_tensor"]
     random_brightness_contrast:
@@ -90,29 +91,29 @@ transforms:
 
 loaders:
   train:
-    batch_size: 4
+    batch_size: 12
     shuffle: True
     num_workers: 0
     drop_last: True
     pin_memory: False
 
   valid:
-    batch_size: 4
+    batch_size: 6
     shuffle: False
     num_workers: 0
     drop_last: False
     pin_memory: False
 
-  test:
-    batch_size: 4
-    shuffle: False
-    num_workers: 0
-    drop_last: False
-    pin_memory: False
+  # test:
+  #   batch_size: 4
+  #   shuffle: False
+  #   num_workers: 0
+  #   drop_last: False
+  #   pin_memory: False
 
-  predict:
-    batch_size: 4
-    shuffle: False
-    num_workers: 0
-    drop_last: False
-    pin_memory: False
+  # predict:
+  #   batch_size: 4
+  #   shuffle: False
+  #   num_workers: 0
+  #   drop_last: False
+  #   pin_memory: False

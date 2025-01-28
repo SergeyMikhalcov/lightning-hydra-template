@@ -14,11 +14,11 @@ defaults:
   - network: unet.yaml
 
 optimizer:
-  _target_: torch.optim.SGD
-  lr: 0.0001
-  momentum: 0.999
-  nesterov: True
-  weight_decay: 0.999
+  _target_: torch.optim.AdamW
+  lr: 0.000000001
+#  momentum: 0.999
+#  nesterov: True
+#  weight_decay: 0.00001
 
 scheduler:
   scheduler:

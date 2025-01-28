@@ -26,7 +26,7 @@ class TransformsWrapper:
                 transforms_cfg.get(augmentation_name), _convert_="object"
             )
             augmentations.append(augmentation)
-        print(augmentations)
+        #print(augmentations)
         self.augmentations = albumentations.Compose(augmentations,
                         additional_targets=transforms_cfg.get("additional_targets"))
 

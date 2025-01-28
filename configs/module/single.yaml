@@ -13,7 +13,7 @@ defaults:
 
 optimizer:
   _target_: torch.optim.AdamW
-  lr: 3.0e-4
+  lr: 1.0e-4
   weight_decay: 1.0e-5
 
 scheduler:

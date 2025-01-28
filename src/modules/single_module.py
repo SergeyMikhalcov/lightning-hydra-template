@@ -277,9 +277,9 @@ class SegmentationLitModule(SingleLitModule):
         #test_label = test_label.to(self.curr_device)
 
         # test_input, test_label = batch
-        recons = self.model(test_input)#, labels = test_label)
+        recons = self.output_activation(self.model(test_input))#, labels = test_label)
         
-        self.logger.experiment.add_image('example_images', make_grid(recons, nrow = 5, normalize = True), self.current_epoch)
+        self.logger.experiment.add_image('example_images', make_grid(recons, nrow = 1, normalize = True), self.current_epoch)
     
     def predict_step(
         self, batch: Any, batch_idx: int, dataloader_idx: int = 0

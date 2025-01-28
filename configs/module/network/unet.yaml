@@ -2,27 +2,28 @@
 
 model:
   _target_: src.modules.models.segmentation.Segmentation
-  model_name: segmentation_models_pytorch/Unet
+  model_name: segmentation_models_pytorch/Segformer
 #  model_name: custom/Unet
-  encoder_name: "mobilenet_v2"
+  encoder_name: "resnet34"
+  #encoder_weights: null
   num_classes: 1
-  in_channels: 1
+  in_channels: 3
 #  classes: 1
 #  out_channels: 1
 #  features: [4, 8, 16, 32, 64, 128, 256, 512]
 
 loss:
-  _target_: "kornia.losses.ssim.SSIMLoss"
-  window_size: 21
+  _target_: "segmentation_models_pytorch.losses.DiceLoss"
+  mode: 'binary'
 
 metrics:
   main: 
-    _target_: "torchmetrics.regression.MeanSquaredError"
-    # task: "multiclass"
-    # num_classes: 1
+    _target_: "torchmetrics.segmentation.MeanIoU"
+    # task: "binary"
+    num_classes: 1
     # top_k: 1
   valid_best:
-    _target_: "torchmetrics.MinMetric"
+    _target_: "torchmetrics.MaxMetric"
     
 
 output_activation:

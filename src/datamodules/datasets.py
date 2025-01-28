@@ -177,7 +177,7 @@ class InpaintingDataset(BaseDataset):
             mask = self._read_image_(mask_path)
             mask[mask==255] = 1.0
             output["mask"] = torch.Tensor(mask).unsqueeze(0).unsqueeze(0)
-        print(output["image"].shape, output["target"].shape)
+        # print(output["image"].shape, output["target"].shape)
         return output
 
 class ClassificationVicRegDataset(ClassificationDataset):
