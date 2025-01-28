@@ -283,7 +283,7 @@ class SegmentationLitModule(SingleLitModule):
         #test_label = test_label.to(self.curr_device)
 
         # test_input, test_label = batch
-        recons = (self.output_activation(self.model(test_input)) > 0.5).int() #, labels = test_label)
+        recons = self.output_activation(self.model(test_input)) #, labels = test_label)
         
         self.logger.experiment.add_image('example_images', make_grid(recons, nrow = 1, normalize = True), self.current_epoch)
     
