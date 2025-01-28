@@ -219,7 +219,7 @@ class SegmentationLitModule(SingleLitModule):
     def model_step(self, batch: Any, *args: Any, **kwargs: Any) -> Any:
         x, y = batch['image'], batch['target']
         logits = self.forward(x)
-        loss = self.loss(logits, y)
+        loss = self.loss(logits, y.float())
         preds = logits
         # preds = self.output_activation(logits)
         return loss, preds, y
@@ -231,7 +231,7 @@ class SegmentationLitModule(SingleLitModule):
             loss,
             **self.logging_params,
         )
-        self.train_metric(preds, targets.float().unsqueeze(1))
+        self.train_metric(preds, targets)
         # preds = preds > 0.5
         # self.train_metric(preds.int(), targets)
         self.log(

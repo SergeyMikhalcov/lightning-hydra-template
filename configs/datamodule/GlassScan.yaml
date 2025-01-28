@@ -7,6 +7,8 @@ datasets:
   train_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/train/sem_seg_cardboard"
   val_data_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/val/data"
   val_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/val/sem_seg_cardboard"
+  test_data_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/test/data"
+  test_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Glass_COCO/test/sem_seg_cardboard"
 
 
 # because we split initial train + test into train + valid + test

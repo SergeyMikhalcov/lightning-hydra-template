@@ -13,7 +13,7 @@ model:
 #  features: [4, 8, 16, 32, 64, 128, 256, 512]
 
 loss:
-  _target_: "nn.BCEWithLogitsLoss"
+  _target_: "torch.nn.BCEWithLogitsLoss"
   # _target_: "segmentation_models_pytorch.losses.DiceLoss"
   # mode: 'binary'
 
