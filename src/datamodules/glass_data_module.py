@@ -7,7 +7,7 @@ from src.datamodules.datamodules import SingleDataModule
 
 
 class GlassDataModule(SingleDataModule):
-    def __init__(self, 
+    def __init__(self,
                  datasets: DictConfig, loaders: DictConfig, transforms: DictConfig
     ) -> None:
         super().__init__(

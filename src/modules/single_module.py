@@ -220,7 +220,8 @@ class SegmentationLitModule(SingleLitModule):
         x, y = batch['image'], batch['target']
         logits = self.forward(x)
         loss = self.loss(logits, y)
-        preds = self.output_activation(logits)
+        preds = logits
+        # preds = self.output_activation(logits)
         return loss, preds, y
     
     def training_step(self, batch: Any, batch_idx: int) -> Any:
@@ -230,15 +231,17 @@ class SegmentationLitModule(SingleLitModule):
             loss,
             **self.logging_params,
         )
-        preds = preds > 0.5
-        self.train_metric(preds.int(), targets)
+        self.train_metric(preds, targets.float().unsqueeze(1))
+        # preds = preds > 0.5
+        # self.train_metric(preds.int(), targets)
         self.log(
             f"{self.train_metric.__class__.__name__}/train",
             self.train_metric,
             **self.logging_params,
         )
 
-        self.train_add_metrics(preds, targets)
+        #self.train_add_metrics(preds, targets)
+        self.train_add_metrics((self.output_activation(preds)>0.5).int(), targets)
         self.log_dict(self.train_add_metrics, **self.logging_params)
 
         # Lightning keeps track of `training_step` outputs and metrics on GPU for
@@ -255,15 +258,17 @@ class SegmentationLitModule(SingleLitModule):
             loss,
             **self.logging_params,
         )
-        preds = preds > 0.5
-        self.valid_metric(preds.int(), targets)
+        # preds = preds > 0.5
+        # self.valid_metric(preds.int(), targets)
+        self.valid_metric(preds, targets.float().unsqueeze(1))
         self.log(
             f"{self.valid_metric.__class__.__name__}/valid",
             self.valid_metric,
             **self.logging_params,
         )
 
-        self.valid_add_metrics(preds, targets)
+        # self.valid_add_metrics(preds, targets)
+        self.valid_add_metrics((self.output_activation(preds) > 0.5).int(), targets)
         self.log_dict(self.valid_add_metrics, **self.logging_params)
         return {"loss": loss}
     
@@ -277,9 +282,15 @@ class SegmentationLitModule(SingleLitModule):
         #test_label = test_label.to(self.curr_device)
 
         # test_input, test_label = batch
-        recons = self.output_activation(self.model(test_input))#, labels = test_label)
+        recons = (self.output_activation(self.model(test_input)) > 0.5).int() #, labels = test_label)
         
         self.logger.experiment.add_image('example_images', make_grid(recons, nrow = 1, normalize = True), self.current_epoch)
+    
+    def test_step(self, batch: Any, batch_idx: int) -> Any:
+       pass
+    
+    def on_test_epoch_end(self) -> None:
+        pass
     
     def predict_step(
         self, batch: Any, batch_idx: int, dataloader_idx: int = 0
