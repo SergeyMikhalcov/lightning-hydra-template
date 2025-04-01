@@ -325,8 +325,8 @@ class BIRADSLitModule(SingleLitModule):
     def model_step(self, batch: Any, *args: Any, **kwargs: Any) -> Any:
         x, y = batch['image'], batch['target']
         logits = self.forward(x)
-        loss = self.loss(logits, y)
         preds = self.output_activation(logits).float()
+        loss = self.loss(preds, y)
         return loss, preds, y
 
 
