@@ -308,9 +308,9 @@ class BreastPairedDataset(BaseDataset):
     def __getitem__(self, index):
         research_df = self.df[self.df[self.id_column] == self.researchs_ids[index]]
         cc_path = research_df[research_df['ViewPosition'] == 'CC'][self.dcm_path_col].apply(
-            lambda x: '\\'.join(x), axis=1).iloc[0]
+            lambda x: '/'.join(x), axis=1).iloc[0]
         mlo_path = research_df[research_df['ViewPosition'] == 'MLO'][self.dcm_path_col].apply(
-            lambda x: '\\'.join(x), axis=1).iloc[0]
+            lambda x: '/'.join(x), axis=1).iloc[0]
         cc_img = self.read_dcm(cc_path)
         mlo_img = self.read_dcm(mlo_path)
         target = research_df[self.target_col].iloc[0]
