@@ -212,6 +212,7 @@ class BoneSuppressionLitModule(SingleLitModule):
         preds = self.output_activation(logits)
         return {"logits": logits, "preds": preds, "targets": y}
 
+
 class SegmentationLitModule(SingleLitModule):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -273,7 +274,7 @@ class SegmentationLitModule(SingleLitModule):
         return {"loss": loss}
     
     def on_validation_epoch_end(self) -> None:
-        print('sample_images')
+        # print('sample_images')
         # Get sample reconstruction image            
         test_input = next(iter(self.trainer.datamodule.val_dataloader()))#['image']
         #print(test_input)
@@ -283,11 +284,27 @@ class SegmentationLitModule(SingleLitModule):
 
         # test_input, test_label = batch
         recons = self.output_activation(self.model(test_input)) #, labels = test_label)
-        
-        self.logger.experiment.add_image('example_images', make_grid(recons, nrow = 1, normalize = True), self.current_epoch)
+        self.logger.experiment.add_image('example_input', make_grid(test_input, nrow = 1, normalize = True), self.current_epoch)
+        self.logger.experiment.add_image('example_segmentation', make_grid(recons, nrow = 1, normalize = True), self.current_epoch)
     
     def test_step(self, batch: Any, batch_idx: int) -> Any:
-       pass
+        loss, preds, targets = self.model_step(batch, batch_idx)
+        self.log(
+            f"{self.loss.__class__.__name__}/test",
+            loss,
+            **self.logging_params,
+        )
+        preds = (self.output_activation(preds) > 0.5).int()
+        self.test_metric(preds, targets)
+        self.log(
+            f"{self.test_metric.__class__.__name__}/test",
+            self.test_metric,
+            **self.logging_params,
+        )
+
+        self.test_add_metrics(preds, targets)
+        self.log_dict(self.test_add_metrics, **self.logging_params)
+        return {"loss": loss}
     
     def on_test_epoch_end(self) -> None:
         pass
@@ -299,6 +316,18 @@ class SegmentationLitModule(SingleLitModule):
         logits = self.forward(x["image"])
         preds = self.output_activation(logits)
         return {"logits": logits, "preds": preds, "targets": y}
+
+
+class BIRADSLitModule(SingleLitModule):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+    def model_step(self, batch: Any, *args: Any, **kwargs: Any) -> Any:
+        x, y = batch['image'], batch['target']
+        logits = self.forward(x)
+        loss = self.loss(logits, y)
+        preds = self.output_activation(logits)
+        return loss, preds, y
 
 
 class MNISTLitModule(SingleLitModule):

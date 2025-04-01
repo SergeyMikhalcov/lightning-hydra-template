@@ -42,6 +42,7 @@ Pillow
 opencv-python-headless
 albumentations
 h5py
+pydicom
 
 # --------- models --------- #
 timm

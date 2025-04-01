@@ -21,6 +21,7 @@ from urllib3.exceptions import InsecureRequestWarning
 
 old_merge_environment_settings = requests.Session.merge_environment_settings
 
+
 @contextlib.contextmanager
 def no_ssl_verification():
     opened_adapters = set()
@@ -194,14 +195,14 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
     test_metrics = trainer.callback_metrics
 
     # Save state dicts for best and last checkpoints
-    # if cfg.get("save_state_dict"):
-    #     log.info("Starting saving state dicts!")
-    #     utils.save_state_dicts(
-    #         trainer=trainer,
-    #         model=model,
-    #         dirname=cfg.paths.output_dir,
-    #         **cfg.extras.state_dict_saving_params,
-    #     )
+    if cfg.get("save_state_dict"):
+        log.info("Starting saving state dicts!")
+        utils.save_state_dicts(
+            trainer=trainer,
+            model=model,
+            dirname=cfg.paths.output_dir,
+            **cfg.extras.state_dict_saving_params,
+        )
 
     # merge train and test metrics
     metric_dict = {**train_metrics, **test_metrics}
@@ -214,7 +215,8 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 def main(cfg: DictConfig) -> Optional[float]:
     
     print(cfg)
-    task = Task.init(task_name="GlassScan", project_name="Glass_Scan")
+    task = Task.init(task_name="BIRADS_ACR",
+                     project_name="BIRADS_ACR")
     task.execute_remotely(queue_name='default', exit_process=True)
     
     # train the model
@@ -230,5 +232,4 @@ def main(cfg: DictConfig) -> Optional[float]:
 
 
 if __name__ == "__main__":
-    
     main()

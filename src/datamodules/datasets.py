@@ -2,10 +2,13 @@ import os
 import json
 import random
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
+from enum import Enum
 
 import numpy as np
+import pandas as pd
 import torch
+import pydicom as pcm
 
 from src.datamodules.components.dataset import BaseDataset
 from src.datamodules.components.h5_file import H5PyFile
@@ -256,4 +259,78 @@ class NoLabelsDataset(BaseDataset):
 
     def __len__(self) -> int:
         return len(self.keys)
-    
+
+
+class BreastPairedDataset(BaseDataset):
+
+    class InputType(Enum):
+        ClassIndex = 0
+        Logits = 1
+
+    ClasName2Index = {'A': 0,
+                      'B': 1,
+                      'C': 2,
+                      'D': 3
+                      }
+    Index2Classname = {0: 'A',
+                       1: 'B',
+                       2: 'C',
+                       3: 'D'
+                       }
+    Logits2Index = np.argmax
+    n_classes = 4
+
+    def __init__(self, csv_path: str, target_column: Union[str, List[str]],
+                 dcm_path_col: Union[str, List[str]], id_column: str,
+                 order: List[str] = ['CC', 'MLO'],
+                 transforms=None) -> None:
+        super().__init__()
+        self.df = pd.read_csv(csv_path, index_col=0)
+        assert id_column in self.df.columns, ValueError(f'Column {id_column} not in DataFrame.')
+        self.id_column = id_column
+        self.researchs_ids = [uid for uid in self.df[id_column].unique() if
+                              len(self.df[self.df[id_column] == uid]) == len(
+                                  order)
+                              ]
+        self.order = order
+        self.dcm_path_col = dcm_path_col
+        self.target_col = target_column
+        self.transforms = transforms
+
+    @staticmethod
+    def read_dcm(path2dcm):
+        dcm = pcm.dcmread(path2dcm)
+        w, h = int(dcm.Rows), int(dcm.Columns)
+        raw_1d = np.frombuffer(dcm[0x00310410].value, dtype=np.uint16)
+        raw = np.reshape(raw_1d, (h, w))
+        return raw
+
+    def __getitem__(self, index):
+        research_df = self.df[self.df[self.id_column] == self.researchs_ids[index]]
+        cc_path = research_df[research_df['ViewPosition'] == 'CC'][self.dcm_path_col].apply(
+            lambda x: '\\'.join(x), axis=1).iloc[0]
+        mlo_path = research_df[research_df['ViewPosition'] == 'MLO'][self.dcm_path_col].apply(
+            lambda x: '\\'.join(x), axis=1).iloc[0]
+        cc_img = self.read_dcm(cc_path)
+        mlo_img = self.read_dcm(mlo_path)
+        target = research_df[self.target_col].iloc[0]
+        if type(target) == str:
+            target = torch.tensor(self.ClasName2Index[target])
+        target = torch.tensor(target)
+        if self.transforms is not None:
+            augmentation = self.transforms(image=cc_img)
+            cc_img = augmentation['image']
+            augmentation = self.transforms(image=mlo_img)
+            mlo_img = augmentation['image']
+        stacked = torch.concat((cc_img, mlo_img), dim=0).unsqueeze(0)
+
+        return {'image': stacked,
+                'target': target,
+                'paths': {
+                    'cc_path': cc_path,
+                    'mlo_path': mlo_path
+                    }
+                }
+
+    def __len__(self):
+        return len(self.researchs_ids)
