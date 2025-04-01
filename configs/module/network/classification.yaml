@@ -1,6 +1,7 @@
 model:
   _target_: src.modules.models.classification.Classifier
   model_name: "timm/resnet50"
+  in_chans: 2
   model_repo: null
   pretrained: True
   num_classes: 4
