@@ -326,7 +326,7 @@ class BIRADSLitModule(SingleLitModule):
         x, y = batch['image'], batch['target']
         logits = self.forward(x)
         loss = self.loss(logits, y)
-        preds = self.output_activation(logits)
+        preds = self.output_activation(logits).float()
         return loss, preds, y
 
 
