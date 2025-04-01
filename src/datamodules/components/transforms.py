@@ -26,9 +26,10 @@ class TransformsWrapper:
                 transforms_cfg.get(augmentation_name), _convert_="object"
             )
             augmentations.append(augmentation)
-        #print(augmentations)
+        print(transforms_cfg)
         self.augmentations = albumentations.Compose(augmentations,
-                        additional_targets=transforms_cfg.get("additional_targets"))
+                        additional_targets=transforms_cfg.get("additional_targets") if
+                            "additional_targets" in transforms_cfg else None)
 
     def __call__(self, image: Any, **kwargs: Any) -> Any:
         """Apply TransformsWrapper module.
