@@ -11,7 +11,7 @@ _target_: src.modules.single_module.BIRADSLitModule
 
 defaults:
   - _self_
-  - network: mnist.yaml
+  - network: classification.yaml
 
 optimizer:
   _target_: torch.optim.Adam
