@@ -1,0 +1,97 @@
+_target_: src.datamodules.breast_datamodule.BreastDataModule
+
+# this config file is used for running the template default tests
+
+datasets:
+  train_scv_path: "/media/images/medical_AI/Annotations_ACR/Labels/breast_train.csv"
+  val_csv_path:  "/media/images/medical_AI/Annotations_ACR/Labels/breast_val.csv"
+  test_csv_path: "/media/images/medical_AI/Annotations_ACR/Labels/breast_val.csv"
+  target_column: 'mammo_ACR_ACR'
+  dcm_path_col: ['ResearchPath','Filename']
+  id_column: 'BreastUID'
+  order: ['CC', 'MLO']
+
+# During testing on MNIST, transformations should be the same
+# because we split initial train + test into train + valid + test
+transforms:
+  train:
+    order: ["resize", "rotate", "hflip", "rand_br_contr", "normalize", "to_tensor"]
+    resize:
+      _target_: albumentations.Resize
+      height: 512
+      width: 512
+      p: 1.0
+
+    rotate:
+      _target_: albumentations.Rotate
+      limit: 20
+      p: 1.0
+
+    hflip:
+      _target_: albumentations.HorizonatalFlip
+      p: 0.5
+
+    normalize:
+      _target_: albumentations.Normalize
+      mean: [0.0]
+      std: [1.0]
+      p: 1.0
+
+    rand_br_contr:
+    _target_: albumentations.RandomBrightnessContrast
+    brightness_limit: 0.05
+    contrast_limit: 0.05
+    p: 1.0
+
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      always_apply: True
+    
+
+  valid_test_predict:
+    order: ["resize", "normalize", "to_tensor"]
+    
+    resize:
+      _target_: albumentations.Resize
+      height: 512
+      width: 512
+      p: 1.0
+
+    normalize:
+      _target_: albumentations.Normalize
+      mean: [0.1307]
+      std: [0.3081]
+      p: 1.0
+
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      always_apply: True
+
+loaders:
+  train:
+    batch_size: 16
+    shuffle: True
+    num_workers: 0
+    drop_last: True
+    pin_memory: False
+
+  valid:
+    batch_size: 16
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False
+
+  test:
+    batch_size: 16
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False
+
+  predict:
+    batch_size: 16
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False

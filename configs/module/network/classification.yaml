@@ -1,24 +1,29 @@
 model:
   _target_: src.modules.models.classification.Classifier
-  model_name: "torchvision.models/mobilenet_v3_large"
+  model_name: "timm/resnet50"
   model_repo: null
-  weights: "IMAGENET1K_V2"
-  num_classes: 1
+  pretrained: True
+  num_classes: 4
   freeze_layers: null
 
 loss:
-  _target_: "torch.nn.BCEWithLogitsLoss"
+  _target_: "torch.nn.CrossEntropyLoss"
 
 metrics:
   main:
     _target_: "torchmetrics.Accuracy"
-    task: "binary"
+    task: "multiclass"
+    num_classes: 4
+    top_k: 1
   valid_best:
     _target_: "torchmetrics.MaxMetric"
   additional:
     AUROC:
       _target_: "torchmetrics.AUROC"
-      task: "binary"
+      task: "multiclass"
+      num_classes: 4
 
 output_activation:
-  _target_: "torch.sigmoid"
+  _target_: "torch.softmax"
+  dim: 1
+

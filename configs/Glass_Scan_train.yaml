@@ -1,26 +1,24 @@
 # @package _global_
 
-# this config file is used for running the template default tests
-
 # specify here default configuration
 # order of defaults determines the order in which configs override each other
 defaults:
   - _self_
-  - datamodule: Breast.yaml
-  - module: BIRADS.yaml
-  - callbacks: mnist.yaml
-  - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
-  - trainer: default.yaml
+  - datamodule: GlassScan.yaml
+  - module: swintransformer.yaml
+  - callbacks: glassscan.yaml
+  - logger: tensorboard.yaml # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
+  - trainer: gpu.yaml
   - paths: default.yaml
   - extras: default.yaml
   - hydra: default.yaml
 
   # experiment configs allow for version control of specific hyperparameters
   # e.g. the best hyperparameters for given model and datamodule
-  - experiment: null
+  - experiment: GlassScan
 
   # config for hyperparameter optimization
-  - hparams_search: null
+  # - hparams_search: bones_optuna_unet
 
   # optional local config for machine/user specific settings
   # it's optional since it doesn't need to exist and is excluded from version control

@@ -1,4 +1,4 @@
-_target_: src.modules.single_module.MNISTLitModule
+_target_: src.modules.single_module.BIRADSLitModule
 
 # this config file is used for running the template default tests
 
@@ -11,7 +11,7 @@ _target_: src.modules.single_module.MNISTLitModule
 
 defaults:
   - _self_
-  - network: classification.yaml
+  - network: mnist.yaml
 
 optimizer:
   _target_: torch.optim.Adam
