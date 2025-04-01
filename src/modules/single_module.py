@@ -328,6 +328,26 @@ class BIRADSLitModule(SingleLitModule):
         preds = self.output_activation(logits).float()
         loss = self.loss(preds, y)
         return loss, preds, y
+    
+    def validation_step(self, batch: Any, batch_idx: int) -> Any:
+        loss, preds, targets = self.model_step(batch, batch_idx)
+
+        self.log(
+            f"{self.loss.__class__.__name__}/valid",
+            loss,
+            **self.logging_params,
+        )
+
+        self.valid_metric(preds, targets)
+        self.log(
+            f"{self.valid_metric.__class__.__name__}/valid",
+            self.valid_metric,
+            **self.logging_params,
+        )
+
+        self.valid_add_metrics(preds, targets)
+        self.log_dict(self.valid_add_metrics, **self.logging_params)
+        return {"loss": loss}
 
 
 class MNISTLitModule(SingleLitModule):

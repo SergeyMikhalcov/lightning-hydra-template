@@ -316,7 +316,8 @@ class BreastPairedDataset(BaseDataset):
         target = research_df[self.target_col].iloc[0]
         if type(target) == str:
             target = torch.tensor(self.ClasName2Index[target], dtype=torch.long)
-        target = torch.tensor(target)
+        else:
+            target = torch.tensor(target)
         if self.transforms is not None:
             augmentation = self.transforms(image=cc_img)
             cc_img = augmentation['image']
