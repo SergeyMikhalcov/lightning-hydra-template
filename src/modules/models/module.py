@@ -1,6 +1,6 @@
 from functools import reduce
 from typing import Any, List, Optional, Union
-import custom
+from src.modules.models import custom
 
 import segmentation_models_pytorch as seg_models
 import timm
