@@ -23,18 +23,18 @@ trainer:
   gradient_clip_val: 0.25
   accumulate_grad_batches: 5
 
-module:
-  optimizer:
-    lr: 0.00000001
+# module:
+#   optimizer:
+#     lr: 0.00000001
 
 datamodule:
   loaders:
     train:
-      batch_size: 13
+      batch_size: 8
     valid:
-      batch_size: 6
-    # test:
-    #   batch_size: 1
+      batch_size: 8
+    test:
+      batch_size: 8
 
 logger:
   wandb:

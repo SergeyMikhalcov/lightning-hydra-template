@@ -5,7 +5,7 @@ model:
   model_name: segmentation_models_pytorch/Segformer
 #  model_name: custom/Unet
   encoder_name: "resnet34"
-  #encoder_weights: null
+# encoder_weights: null
   num_classes: 1
   in_channels: 3
 #  classes: 1
@@ -25,6 +25,10 @@ metrics:
     # top_k: 1
   valid_best:
     _target_: "torchmetrics.MaxMetric"
+  additional:
+    GDS:
+      _target_: "torchmetrics.segmentation.GeneralizedDiceScore"
+      num_classes: 1
     
 
 output_activation:

@@ -322,7 +322,7 @@ class BreastPairedDataset(BaseDataset):
             cc_img = augmentation['image']
             augmentation = self.transforms(image=mlo_img)
             mlo_img = augmentation['image']
-        stacked = torch.concat((cc_img, mlo_img), dim=0).unsqueeze(0)
+        stacked = torch.concat((cc_img, mlo_img), dim=0)
 
         return {'image': stacked,
                 'target': target,

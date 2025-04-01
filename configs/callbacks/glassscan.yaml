@@ -7,7 +7,7 @@ swa:
 model_checkpoint:
   _target_: pytorch_lightning.callbacks.ModelCheckpoint
   dirpath: ${paths.output_dir}/checkpoints # directory to save the model file
-  filename: ${replace:"epoch{epoch:03d}-loss_valid{DiceLoss/valid:.4f}-metric_valid{MeanIoU/valid:.4f}"} # checkpoint filename
+  filename: ${replace:"epoch{epoch:03d}-loss_valid{BCEWithLogitsLoss/valid:.4f}-metric_valid{MeanIoU/valid:.4f}"} # checkpoint filename
   monitor: ${replace:"MeanIoU/train"} # name of the logged metric which determines when model is improving
   verbose: False # verbosity mode
   save_last: True # additionally always save an exact copy of the last checkpoint to a file last.ckpt

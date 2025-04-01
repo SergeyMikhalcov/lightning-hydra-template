@@ -10,7 +10,7 @@ defaults:
   - module: BIRADS.yaml
   - callbacks: mnist.yaml
   - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
-  - trainer: default.yaml
+  - trainer: gpu.yaml
   - paths: default.yaml
   - extras: default.yaml
   - hydra: default.yaml
