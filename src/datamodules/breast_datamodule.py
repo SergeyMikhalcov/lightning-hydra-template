@@ -34,6 +34,9 @@ class BreastDataModule(SingleDataModule):
                 self.cfg_datasets.get("id_column"),
                 self.cfg_datasets.get("order"),
                 transforms=transforms_train,
+                use_brut_invariant=self.cfg_datasets.get("use_brut_invariant"),
+                one_of_postproc=self.cfg_datasets.get("one_of_postproc"),
+                replace_names=self.cfg_datasets.get("replace_names"),
             )
             self.valid_set = BreastPairedDataset(
                 self.cfg_datasets.get("val_csv_path"),
@@ -42,6 +45,9 @@ class BreastDataModule(SingleDataModule):
                 self.cfg_datasets.get("id_column"),
                 self.cfg_datasets.get("order"),
                 transforms=transforms_test,
+                use_brut_invariant=self.cfg_datasets.get("use_brut_invariant"),
+                one_of_postproc=self.cfg_datasets.get("one_of_postproc"),
+                replace_names=self.cfg_datasets.get("replace_names"),
             )
             self.test_set = BreastPairedDataset(
                 self.cfg_datasets.get("test_csv_path"),
@@ -50,6 +56,9 @@ class BreastDataModule(SingleDataModule):
                 self.cfg_datasets.get("id_column"),
                 self.cfg_datasets.get("order"),
                 transforms=transforms_test,
+                use_brut_invariant=self.cfg_datasets.get("use_brut_invariant"),
+                one_of_postproc=self.cfg_datasets.get("one_of_postproc"),
+                replace_names=self.cfg_datasets.get("replace_names"),
             )
         # load predict dataset only if test set existed already
         if (stage == "predict") and self.test_set:

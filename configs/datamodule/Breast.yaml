@@ -14,8 +14,9 @@ datasets:
   #dcm_path_col: ['ResearchPath','Filename']
   id_column: 'BreastUID'
   order: ['CC', 'MLO']
-  use_brut_invariant: False
+  use_brut_invariant: True
   one_of_postproc: True
+  replace_names: True
 
 # During testing on MNIST, transformations should be the same
 # because we split initial train + test into train + valid + test
