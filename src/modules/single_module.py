@@ -329,6 +329,31 @@ class BIRADSLitModule(SingleLitModule):
         loss = self.loss(preds, y)
         return loss, preds, y
     
+    def training_step(self, batch: Any, batch_idx: int) -> Any:
+        loss, preds, targets = self.model_step(batch, batch_idx)
+        self.log(
+            f"{self.loss.__class__.__name__}/train",
+            loss,
+            **self.logging_params,
+        )
+
+        self.train_metric(preds, targets)
+        self.log(
+            f"{self.train_metric.__class__.__name__}/train",
+            self.train_metric,
+            **self.logging_params,
+        )
+
+        self.train_add_metrics(preds, targets)
+        self.log_dict(self.train_add_metrics, **self.logging_params)
+
+        # Lightning keeps track of `training_step` outputs and metrics on GPU for
+        # optimization purposes. This works well for medium size datasets, but
+        # becomes an issue with larger ones. It might show up as a CPU memory leak
+        # during training step. Keep it in mind.
+        return {"loss": loss}
+
+    
     def validation_step(self, batch: Any, batch_idx: int) -> Any:
         loss, preds, targets = self.model_step(batch, batch_idx)
 
@@ -347,6 +372,25 @@ class BIRADSLitModule(SingleLitModule):
 
         self.valid_add_metrics(preds, targets)
         self.log_dict(self.valid_add_metrics, **self.logging_params)
+        return {"loss": loss}
+    
+    def test_step(self, batch: Any, batch_idx: int) -> Any:
+        loss, preds, targets = self.model_step(batch, batch_idx)
+        self.log(
+            f"{self.loss.__class__.__name__}/test",
+            loss,
+            **self.logging_params,
+        )
+        preds = self.output_activation(preds)
+        self.test_metric(preds, targets)
+        self.log(
+            f"{self.test_metric.__class__.__name__}/test",
+            self.test_metric,
+            **self.logging_params,
+        )
+
+        self.test_add_metrics(preds, targets)
+        self.log_dict(self.test_add_metrics, **self.logging_params)
         return {"loss": loss}
 
 

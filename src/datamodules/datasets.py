@@ -8,6 +8,7 @@ from enum import Enum
 import numpy as np
 import pandas as pd
 import torch
+from PIL import Image
 import pydicom as pcm
 
 from src.datamodules.components.dataset import BaseDataset
@@ -283,7 +284,10 @@ class BreastPairedDataset(BaseDataset):
     def __init__(self, csv_path: str, target_column: Union[str, List[str]],
                  dcm_path_col: Union[str, List[str]], id_column: str,
                  order: List[str] = ['CC', 'MLO'],
-                 transforms=None) -> None:
+                 transforms=None,
+                 use_brut_invariant: bool = False,
+                 one_of_postproc: bool = False,
+                 replace_names: bool = True) -> None:
         super().__init__()
         self.df = pd.read_csv(csv_path, index_col=0)
         assert id_column in self.df.columns, ValueError(f'Column {id_column} not in DataFrame.')
@@ -296,6 +300,9 @@ class BreastPairedDataset(BaseDataset):
         self.dcm_path_col = dcm_path_col
         self.target_col = target_column
         self.transforms = transforms
+        self.brut_inv = use_brut_invariant
+        self.one_of_aug = one_of_postproc
+        self.replace_names = replace_names
 
     @staticmethod
     def read_dcm(path2dcm):
@@ -307,12 +314,45 @@ class BreastPairedDataset(BaseDataset):
 
     def __getitem__(self, index):
         research_df = self.df[self.df[self.id_column] == self.researchs_ids[index]]
-        cc_path = research_df[research_df['ViewPosition'] == 'CC'][self.dcm_path_col].apply(
-            lambda x: '/'.join(x), axis=1).iloc[0]
-        mlo_path = research_df[research_df['ViewPosition'] == 'MLO'][self.dcm_path_col].apply(
-            lambda x: '/'.join(x), axis=1).iloc[0]
-        cc_img = self.read_dcm(cc_path)
-        mlo_img = self.read_dcm(mlo_path)
+        if isinstance(self.dcm_path_col, list) and not self.one_of_aug:
+            cc_path = research_df[research_df['ViewPosition'] ==
+                                  'CC'][self.dcm_path_col].apply(
+                lambda x: '/'.join(x), axis=1).iloc[0]
+            mlo_path = research_df[research_df['ViewPosition'] ==
+                                   'MLO'][self.dcm_path_col].apply(
+                lambda x: '/'.join(x), axis=1).iloc[0]
+            if self.replace_names:
+                cc_path = cc_path.replace('aserver-images',
+                                          'media').replace('\\', '/')
+                mlo_path = mlo_path.replace('aserver-images',
+                                            'media').replace('\\', '/')
+            cc_img = self.read_dcm(Path(cc_path))
+            mlo_img = self.read_dcm(Path(mlo_path))
+        elif isinstance(self.dcm_path_col, list) and self.one_of_aug:
+            postproc = random.choice(self.dcm_path_col)
+            cc_path = research_df[research_df['ViewPosition'] ==
+                                  'CC'][postproc].iloc[0]
+            mlo_path = research_df[research_df['ViewPosition'] ==
+                                   'MLO'][postproc].iloc[0]
+            if self.replace_names:
+                cc_path = cc_path.replace('aserver-images',
+                                          'media').replace('\\', '/')
+                mlo_path = mlo_path.replace('aserver-images',
+                                            'media').replace('\\', '/')
+            cc_img = np.array(Image.open(Path(cc_path)))
+            mlo_img = np.array(Image.open(Path(mlo_path)))
+        elif isinstance(self.dcm_path_col, str):
+            cc_path = research_df[research_df['ViewPosition'] ==
+                                  'CC'][self.dcm_path_col].iloc[0]
+            mlo_path = research_df[research_df['ViewPosition'] ==
+                                   'MLO'][self.dcm_path_col].iloc[0]
+            if self.replace_names:
+                cc_path = cc_path.replace('aserver-images',
+                                          'media').replace('\\', '/')
+                mlo_path = mlo_path.replace('aserver-images',
+                                            'media').replace('\\', '/')
+            cc_img = np.array(Image.open(Path(cc_path)))
+            mlo_img = np.array(Image.open(Path(mlo_path)))
         target = research_df[self.target_col].iloc[0]
         if type(target) == str:
             target = torch.tensor(self.ClasName2Index[target], dtype=torch.long)
@@ -323,6 +363,9 @@ class BreastPairedDataset(BaseDataset):
             cc_img = augmentation['image']
             augmentation = self.transforms(image=mlo_img)
             mlo_img = augmentation['image']
+        if self.brut_inv:
+            if random.random() > 0.5:
+                cc_img, mlo_img = 1-cc_img, 1-mlo_img
         stacked = torch.concat((cc_img, mlo_img), dim=0)
 
         return {'image': stacked,

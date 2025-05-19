@@ -9,13 +9,15 @@ model:
 
 loss:
   _target_: "torch.nn.CrossEntropyLoss"
+  weight: [0.037, 0.076, 0.13, 0.75]
 
 metrics:
   main:
-    _target_: "torchmetrics.Accuracy"
-    task: "multiclass"
+    _target_: torchmetrics.F1Score
+    task: multiclass
     num_classes: 4
     top_k: 1
+    average: "weighted"  
   valid_best:
     _target_: "torchmetrics.MaxMetric"
   additional:

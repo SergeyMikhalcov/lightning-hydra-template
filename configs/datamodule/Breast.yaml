@@ -3,19 +3,35 @@ _target_: src.datamodules.breast_datamodule.BreastDataModule
 # this config file is used for running the template default tests
 
 datasets:
-  train_csv_path: "/media/images/medical_AI/Annotations_ACR/Labels/train_MarginalVoting.csv"
-  val_csv_path:  "/media/images/medical_AI/Annotations_ACR/Labels/val_MarginalVoting.csv"
-  test_csv_path: "/media/images/medical_AI/Annotations_ACR/Labels/val_MarginalVoting.csv"
+  train_csv_path: "/media/images/medical_AI/Annotations_ACR/Labels/train_MarginalVoting_.csv"
+  val_csv_path:  "/media/images/medical_AI/Annotations_ACR/Labels/val_MarginalVoting_.csv"
+  test_csv_path: "/media/images/medical_AI/Annotations_ACR/Labels/val_MarginalVoting_.csv"
+  # train_csv_path: "\\\\aserver-images\\images\\medical_AI\\Annotations_ACR\\Labels\\train_MarginalVoting.csv"
+  # val_csv_path:  "\\\\aserver-images\\images\\medical_AI\\Annotations_ACR\\Labels\\val_MarginalVoting.csv"
+  # test_csv_path: "\\\\aserver-images\\images\\medical_AI\\Annotations_ACR\\Labels\\val_MarginalVoting.csv"
   target_column: 'mammo_ACR_ACR'
-  dcm_path_col: ['ResearchPath_linux','Filename']
+  dcm_path_col: ['Raw_path', 'Treevias_path', 'MammDll_path']
+  #dcm_path_col: ['ResearchPath','Filename']
   id_column: 'BreastUID'
   order: ['CC', 'MLO']
+  use_brut_invariant: False
+  one_of_postproc: True
 
 # During testing on MNIST, transformations should be the same
 # because we split initial train + test into train + valid + test
 transforms:
   train:
-    order: ["resize", "rotate", "horizontal_flip", "random_brightness_contrast", "normalize", "to_tensor"]
+    order: [ 
+      "normalize", 
+      "resize", 
+      "rotate", 
+      "horizontal_flip", 
+      "random_brightness_contrast", 
+      "median_blur", 
+      "gauss_noise", 
+      "random_gamma", 
+      "to_tensor"
+    ]
     resize:
       _target_: albumentations.Resize
       height: 512
@@ -30,21 +46,39 @@ transforms:
       p: 0.5
     normalize:
       _target_: albumentations.Normalize
+      #normalization: "min_max"
       mean: [0.0]
       std: [1.0]
+      max_pixel_value: 1
       p: 1.0
     random_brightness_contrast:
       _target_: albumentations.RandomBrightnessContrast
-      brightness_limit: 0.05
-      contrast_limit: 0.05
+      brightness_limit: 0.15
+      contrast_limit: 0.15
       p: 1.0
+    median_blur:
+      _target_: albumentations.MedianBlur
+      blur_limit: 5
+      p: 0.25
+    gauss_noise:
+      _target_: albumentations.GaussNoise
+      std_range: [0.01, 0.05]
+      p: 0.5
+    random_gamma:
+      _target_: albumentations.RandomGamma
+      gamma_limit: [90, 100]
+      p: 0.2
     to_tensor:
       _target_: albumentations.pytorch.ToTensorV2
       p: 1.0
     additional_targets: null
 
   valid_test_predict:
-    order: ["resize", "normalize", "to_tensor"]
+    order: [
+      "normalize", 
+      "resize", 
+      "to_tensor"
+      ]
     resize:
       _target_: albumentations.Resize
       height: 512
@@ -52,8 +86,10 @@ transforms:
       p: 1.0
     normalize:
       _target_: albumentations.Normalize
+      #normalization: "min_max"
       mean: [0.0]
       std: [1.0]
+      max_pixel_value: 1
       p: 1.0
     to_tensor:
       _target_: albumentations.pytorch.ToTensorV2
@@ -62,21 +98,21 @@ transforms:
 
 loaders:
   train:
-    batch_size: 16
+    batch_size: 52
     shuffle: True
     num_workers: 0
     drop_last: True
     pin_memory: False
 
   valid:
-    batch_size: 16
+    batch_size: 52
     shuffle: False
     num_workers: 0
     drop_last: False
     pin_memory: False
 
   test:
-    batch_size: 16
+    batch_size: 52
     shuffle: False
     num_workers: 0
     drop_last: False
