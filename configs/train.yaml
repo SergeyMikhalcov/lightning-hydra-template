@@ -9,7 +9,7 @@ defaults:
   - datamodule: Breast.yaml
   - module: BIRADS.yaml
   - callbacks: mnist.yaml
-  - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
+  - logger: tensorboard.yaml # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
   - trainer: gpu.yaml
   - paths: default.yaml
   - extras: default.yaml
@@ -48,7 +48,7 @@ test: True
 save_state_dict: True
 
 # simply provide checkpoint path to resume training
-ckpt_path: null
+ckpt_path: null #/aserver-images/images/medical_AI/MAMMO/checkpoints/epoch047-loss_valid0.8689-metric_valid0.8957.ckpt
 
 # seed for random number generators in pytorch, numpy and python.random
 seed: 42
