@@ -10,7 +10,7 @@ datasets:
   # val_csv_path:  "\\\\aserver-images\\images\\medical_AI\\Annotations_ACR\\Labels\\val_MarginalVoting.csv"
   # test_csv_path: "\\\\aserver-images\\images\\medical_AI\\Annotations_ACR\\Labels\\val_MarginalVoting.csv"
   target_column: 'mammo_ACR_ACR'
-  dcm_path_col: ['Raw_path', 'Treevias_path', 'MammDll_path']
+  dcm_path_col: ['Raw_path', 'MammDll_path', 'Treevias_path']
   #dcm_path_col: ['ResearchPath','Filename']
   id_column: 'BreastUID'
   order: ['CC', 'MLO']
@@ -27,6 +27,7 @@ transforms:
       "resize", 
       "rotate", 
       "horizontal_flip", 
+      "vertical_flip",
       "random_brightness_contrast", 
       "median_blur", 
       "gauss_noise", 
@@ -44,6 +45,9 @@ transforms:
       p: 1.0
     horizontal_flip:
       _target_: albumentations.HorizontalFlip
+      p: 0.5
+    vertical_flip:
+      _target_: albumentations.VerticalFlip
       p: 0.5
     normalize:
       _target_: albumentations.Normalize
@@ -63,8 +67,8 @@ transforms:
       p: 0.25
     gauss_noise:
       _target_: albumentations.GaussNoise
-      std_range: [0.01, 0.05]
-      p: 0.5
+      std_range: [0.001, 0.05]
+      p: 1.0
     random_gamma:
       _target_: albumentations.RandomGamma
       gamma_limit: [90, 100]

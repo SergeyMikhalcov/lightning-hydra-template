@@ -213,12 +213,12 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 @utils.register_custom_resolvers(**_HYDRA_PARAMS)
 @hydra.main(**_HYDRA_PARAMS)
 def main(cfg: DictConfig) -> Optional[float]:
-    
+
     print(cfg)
-    task = Task.init(task_name="BIRADS_ACR",
-                     project_name="BIRADS_ACR")
+    task = Task.init(task_name="Glass_Scan",
+                     project_name="Glass_Scan")
     task.execute_remotely(queue_name='default', exit_process=True)
-    
+
     # train the model
     metric_dict, _ = train(cfg)
 

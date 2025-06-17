@@ -1,12 +1,14 @@
 # @package _global_
 
+# this config file is used for running the template default tests
+
 # specify here default configuration
 # order of defaults determines the order in which configs override each other
 defaults:
   - _self_
-  - datamodule: GlassScan.yaml
-  - module: swintransformer.yaml
-  - callbacks: glassscan.yaml
+  - datamodule: Breast.yaml
+  - module: BIRADS.yaml
+  - callbacks: mnist.yaml
   - logger: tensorboard.yaml # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
   - trainer: gpu.yaml
   - paths: default.yaml
@@ -15,10 +17,10 @@ defaults:
 
   # experiment configs allow for version control of specific hyperparameters
   # e.g. the best hyperparameters for given model and datamodule
-  - experiment: GlassScan
+  - experiment: null
 
   # config for hyperparameter optimization
-  # - hparams_search: bones_optuna_unet
+  - hparams_search: null
 
   # optional local config for machine/user specific settings
   # it's optional since it doesn't need to exist and is excluded from version control
@@ -46,7 +48,7 @@ test: True
 save_state_dict: True
 
 # simply provide checkpoint path to resume training
-ckpt_path: null
+ckpt_path: null #/aserver-images/images/medical_AI/MAMMO/checkpoints/epoch047-loss_valid0.8689-metric_valid0.8957.ckpt
 
 # seed for random number generators in pytorch, numpy and python.random
 seed: 42
