@@ -3,13 +3,16 @@ _target_: pytorch_lightning.Trainer
 default_root_dir: ${paths.output_dir}
 
 min_epochs: 1 # prevents early stopping
-max_epochs: 100
+max_epochs: 1000
 
 accelerator: cpu
 devices: 1
 
 # mixed precision for extra speed-up
-# precision: 16
+# precision: 'bf16'
+accumulate_grad_batches: 10
+
+gradient_clip_val: 0.5
 
 # perform a validation loop every N training epochs
 check_val_every_n_epoch: 1

@@ -1,0 +1,121 @@
+_target_: src.datamodules.glass_data_module.GlassDataModule
+
+# this config file is used for running the template default tests
+
+datasets:
+  train_data_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Plastic_COCO/train/13_06_25_Plastic_grouped"
+  train_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Plastic_COCO/train/target"
+  val_data_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Plastic_COCO/val/13_06_25_Plastic_grouped"
+  val_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Plastic_COCO/val/target"
+  test_data_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Plastic_COCO/test/13_06_25_Plastic_grouped"
+  test_target_path: "/media/images/ОРПО/SECURITY/GlassScan/datasets/Test_Plastic_COCO/test/target"
+
+
+# because we split initial train + test into train + valid + test
+transforms:
+  train:
+    order: ["rotate", "random_crop", "vertical_flip", 
+            "horizontal_flip", 
+            # "random_brightness_contrast",
+            # "gaussian_noise", "gaussian_blur", "motion_blur",
+            "normalize", "to_tensor"]
+    # order: ["resize", "normalize", "to_tensor"]
+    random_brightness_contrast:
+      _target_: albumentations.RandomBrightnessContrast
+      brightness_limit: .1
+      contrast_limit: .1
+      p: 0.5
+    gaussian_noise:
+      _target_: albumentations.GaussNoise
+      var_limit: [10, 50]
+      p: .05
+    gaussian_blur:
+      _target_: albumentations.GaussianBlur
+      p: .05
+    motion_blur:
+      _target_: albumentations.MotionBlur
+      p: .05
+    resize:
+      _target_: albumentations.Resize
+      height: 256
+      width: 4096
+      p: 1.0
+    random_crop:
+      _target_: albumentations.RandomCrop 
+      height: 256
+      width: 4096
+      p: 1.0
+    vertical_flip:
+      _target_: albumentations.VerticalFlip
+      p: 0.5
+    horizontal_flip:
+      _target_: albumentations.HorizontalFlip
+      p: 0.5
+    rotate:
+      _target_: albumentations.SafeRotate
+      limit: [-30, 30]
+      p: 0.5
+    normalize:
+      _target_: albumentations.Normalize
+      mean: [0.0]
+      std: [1.0]
+      p: 1.0
+      max_pixel_value: 255.0
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      p: 1.0
+    # additional_targets:
+    #   {'mask': 'image'}
+
+  valid_test_predict:
+    order: ["random_crop", "normalize", "to_tensor"]
+    random_crop:
+      _target_: albumentations.RandomCrop 
+      height: 256
+      width: 4096
+      p: 1.0
+    resize:
+      _target_: albumentations.Resize
+      height: 1536
+      width: 1536
+      p: 1.0
+    normalize:
+      _target_: albumentations.Normalize
+      mean: [0.0]
+      std: [1.0]
+      p: 1.0
+      max_pixel_value: 255.0
+    to_tensor:
+      _target_: albumentations.pytorch.ToTensorV2
+      p: 1.0
+    # additional_targets:
+    #   {'mask': 'image'}
+
+loaders:
+  train:
+    batch_size: 12
+    shuffle: True
+    num_workers: 0
+    drop_last: True
+    pin_memory: False
+
+  valid:
+    batch_size: 12
+    shuffle: True
+    num_workers: 0
+    drop_last: False
+    pin_memory: False
+
+  test:
+    batch_size: 8
+    shuffle: False
+    num_workers: 0
+    drop_last: False
+    pin_memory: False
+
+  # predict:
+  #   batch_size: 4
+  #   shuffle: False
+  #   num_workers: 0
+  #   drop_last: False
+  #   pin_memory: False

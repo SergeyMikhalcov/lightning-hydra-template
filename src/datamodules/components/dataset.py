@@ -84,7 +84,7 @@ class BaseDataset(Dataset):
         elif read_mode == "uint16":
             image = np.asarray(Image.open(image)).astype(np.float32)
         elif read_mode == "mask":
-            image = np.asarray(Image.open(image))
+            image = np.asarray(Image.open(image))            
         else:
             raise NotImplementedError("use pillow or cv2 or uint16 or mask")
         return image
@@ -100,21 +100,21 @@ class BaseDataset(Dataset):
         Returns:
             torch.Tensor: Image prepared for dataloader.
         """
-        
+
         if self.transforms:
             if mask is not None:
                 output = self.transforms(image=image, mask=mask)
                 output = (output['image'], output['mask'])
             else:
                 output = self.transforms(image=image)["image"]
-                
+
         else:
             if len(image.shape) < 3:
                 image = np.expand_dims(image, 2)
             output = torch.from_numpy(image).permute(2, 0, 1)
 
         return output
-    
+
     def __getitem__(self, index: int) -> Any:
         raise NotImplementedError()
 

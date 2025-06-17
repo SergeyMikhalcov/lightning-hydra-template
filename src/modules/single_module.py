@@ -216,7 +216,7 @@ class BoneSuppressionLitModule(SingleLitModule):
 class SegmentationLitModule(SingleLitModule):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        
+
     def model_step(self, batch: Any, *args: Any, **kwargs: Any) -> Any:
         x, y = batch['image'], batch['target']
         logits = self.forward(x)
@@ -224,7 +224,7 @@ class SegmentationLitModule(SingleLitModule):
         preds = logits
         # preds = self.output_activation(logits)
         return loss, preds, y
-    
+
     def training_step(self, batch: Any, batch_idx: int) -> Any:
         loss, preds, targets = self.model_step(batch, batch_idx)
         self.log(
@@ -250,10 +250,10 @@ class SegmentationLitModule(SingleLitModule):
         # becomes an issue with larger ones. It might show up as a CPU memory leak
         # during training step. Keep it in mind.
         return {"loss": loss}
-    
+
     def validation_step(self, batch: Any, batch_idx: int) -> Any:
         loss, preds, targets = self.model_step(batch, batch_idx)
-        
+
         self.log(
             f"{self.loss.__class__.__name__}/valid",
             loss,
@@ -283,9 +283,9 @@ class SegmentationLitModule(SingleLitModule):
         #test_label = test_label.to(self.curr_device)
 
         # test_input, test_label = batch
-        recons = self.output_activation(self.model(test_input)) #, labels = test_label)
-        self.logger.experiment.add_image('example_input', make_grid(test_input, nrow = 1, normalize = True), self.current_epoch)
-        self.logger.experiment.add_image('example_segmentation', make_grid(recons, nrow = 1, normalize = True), self.current_epoch)
+        #recons = self.output_activation(self.model(test_input)) #, labels = test_label)
+        #self.logger.experiment.add_image('example_input', make_grid(test_input, nrow = 1, normalize = True), self.current_epoch)
+        #self.logger.experiment.add_image('example_segmentation', make_grid(recons, nrow = 1, normalize = True), self.current_epoch)
     
     def test_step(self, batch: Any, batch_idx: int) -> Any:
         loss, preds, targets = self.model_step(batch, batch_idx)

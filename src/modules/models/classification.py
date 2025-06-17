@@ -57,7 +57,19 @@ class Classifier(BaseModule):
         )
         # replace head module to new module
         replace_module_by_identity(
-            self.model, head, nn.Linear(in_features, num_classes, bias=True)
+            self.model, head,
+            # nn.Sequential(
+            #     nn.Linear(in_features, 1024, bias=True),
+            #     nn.BatchNorm1d(1024),
+            #     nn.SiLU(inplace=True),
+            #     nn.Dropout(0.2),
+            #     nn.Linear(1024, 512, bias=True),
+            #     nn.BatchNorm1d(512),
+            #     nn.SiLU(inplace=True),
+            #     nn.Dropout(0.2),
+            #     nn.Linear(512, num_classes, bias=True)
+            # )
+            nn.Linear(in_features, num_classes, bias=True)
         )
         print(self.model)
         self.num_classes = num_classes

@@ -2,12 +2,14 @@ import os
 import json
 import random
 from pathlib import Path
+from collections.abc import Iterable
 from typing import Any, Callable, Dict, List, Optional, Union
 from enum import Enum
 
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn.functional as F
 from PIL import Image
 import pydicom as pcm
 
@@ -184,6 +186,7 @@ class InpaintingDataset(BaseDataset):
         # print(output["image"].shape, output["target"].shape)
         return output
 
+
 class ClassificationVicRegDataset(ClassificationDataset):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -314,7 +317,19 @@ class BreastPairedDataset(BaseDataset):
 
     def __getitem__(self, index):
         research_df = self.df[self.df[self.id_column] == self.researchs_ids[index]]
-        if isinstance(self.dcm_path_col, list) and not self.one_of_aug:
+        if isinstance(self.dcm_path_col, str):
+            cc_path = research_df[research_df['ViewPosition'] ==
+                                  'CC'][self.dcm_path_col].iloc[0]
+            mlo_path = research_df[research_df['ViewPosition'] ==
+                                   'MLO'][self.dcm_path_col].iloc[0]
+            if self.replace_names:
+                cc_path = cc_path.replace('aserver-images',
+                                          'media').replace('\\', '/')
+                mlo_path = mlo_path.replace('aserver-images',
+                                            'media').replace('\\', '/')
+            cc_img = np.array(Image.open(Path(cc_path)))
+            mlo_img = np.array(Image.open(Path(mlo_path)))
+        elif (isinstance(self.dcm_path_col, Iterable) and not self.one_of_aug):
             cc_path = research_df[research_df['ViewPosition'] ==
                                   'CC'][self.dcm_path_col].apply(
                 lambda x: '/'.join(x), axis=1).iloc[0]
@@ -328,24 +343,12 @@ class BreastPairedDataset(BaseDataset):
                                             'media').replace('\\', '/')
             cc_img = self.read_dcm(Path(cc_path))
             mlo_img = self.read_dcm(Path(mlo_path))
-        elif isinstance(self.dcm_path_col, list) and self.one_of_aug:
+        elif (isinstance(self.dcm_path_col, Iterable) and self.one_of_aug):
             postproc = random.choice(self.dcm_path_col)
             cc_path = research_df[research_df['ViewPosition'] ==
                                   'CC'][postproc].iloc[0]
             mlo_path = research_df[research_df['ViewPosition'] ==
                                    'MLO'][postproc].iloc[0]
-            if self.replace_names:
-                cc_path = cc_path.replace('aserver-images',
-                                          'media').replace('\\', '/')
-                mlo_path = mlo_path.replace('aserver-images',
-                                            'media').replace('\\', '/')
-            cc_img = np.array(Image.open(Path(cc_path)))
-            mlo_img = np.array(Image.open(Path(mlo_path)))
-        elif isinstance(self.dcm_path_col, str):
-            cc_path = research_df[research_df['ViewPosition'] ==
-                                  'CC'][self.dcm_path_col].iloc[0]
-            mlo_path = research_df[research_df['ViewPosition'] ==
-                                   'MLO'][self.dcm_path_col].iloc[0]
             if self.replace_names:
                 cc_path = cc_path.replace('aserver-images',
                                           'media').replace('\\', '/')
